@@ -15,21 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
+    <ClInclude Include="headers\framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="headers\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
+    <ClInclude Include="headers\Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MAM-R.h">
+    <ClInclude Include="headers\MAM-R.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MAM-R.cpp">
+    <ClCompile Include="src\MAM-R.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
