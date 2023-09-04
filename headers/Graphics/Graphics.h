@@ -72,6 +72,7 @@ public:
 	void SetCamera(DirectX::FXMMATRIX cam) noexcept;
 	DirectX::XMMATRIX GetCamera() const noexcept;
 
+	void OnResize(u32 newWidth, u32 newHeight);
 	u32 GetWidth() const noexcept;
 	u32 GetHeight() const noexcept;
 	f32 GetRefreshRate() const;

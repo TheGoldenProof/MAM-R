@@ -55,6 +55,8 @@ public:
 	void SetTitle(LPCWSTR title);
 	static std::optional<i32> ProcessMessages();
 	Graphics& Gfx();
+	
+	void OnResize(u32 width, u32 height);
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

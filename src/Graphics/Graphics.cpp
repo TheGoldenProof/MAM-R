@@ -160,6 +160,21 @@ void Graphics::SetCamera(DirectX::FXMMATRIX cam) noexcept { camera = cam; }
 
 DirectX::XMMATRIX Graphics::GetCamera() const noexcept { return camera; }
 
+void Graphics::OnResize(u32 newWidth, u32 newHeight) {
+	width = newWidth;
+	height = newHeight;
+	
+	pContext->OMSetRenderTargets(0, nullptr, nullptr);
+	pTarget->Release();
+
+	HRESULT hr;
+	GFX_THROW_INFO(pSwap->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
+
+	wrl::ComPtr<ID3D11Resource> pBackBuffer;
+	GFX_THROW_INFO(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
+	GFX_THROW_INFO(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, pTarget.GetAddressOf()));
+}
+
 u32 Graphics::GetWidth() const noexcept { return width; }
 u32 Graphics::GetHeight() const noexcept { return height; }
 

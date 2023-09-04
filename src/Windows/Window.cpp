@@ -40,7 +40,7 @@ HACCEL Window::WinAPIClass::GetAccelTable() noexcept { return wndClass.hAccelTab
 
 Window::Window(i32 width, i32 height, LPCWSTR title) : width(width), height(height) {
     RECT wr{128, 128, 128+width, 128+height};
-    LONG wstyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+    LONG wstyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_THICKFRAME; 
 
     if (AdjustWindowRect(&wr, wstyle , FALSE) == 0) throw MYWND_LAST_EXCEPT();
 
@@ -89,6 +89,12 @@ std::optional<i32> Window::ProcessMessages() {
 Graphics& Window::Gfx() { 
     if (!pGfx) throw MYWND_NOGFX_EXCEPT();
     return *pGfx; 
+}
+
+void Window::OnResize(u32 width_, u32 height_) {
+    width = static_cast<i32>(width_);
+    height = static_cast<i32>(height_);
+    if (pGfx) Gfx().OnResize(width_, height_);
 }
 
 LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -144,6 +150,9 @@ LRESULT Window::HandleMsg(HWND _hWnd, UINT msg, WPARAM wParam, LPARAM lParam) no
         break;
     case WM_KILLFOCUS:
         kbd.ClearState();
+        break;
+    case WM_SIZE:
+        OnResize(LOWORD(lParam), HIWORD(lParam));
         break;
 
     case WM_KEYDOWN:

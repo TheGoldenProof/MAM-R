@@ -146,13 +146,14 @@ void App::Draw(f32 dt) {
 
     //if (show_demo_window && gb.Gfx().IsImguiEnabled()) ImGui::ShowDemoWindow(&show_demo_window);
 
+    #if 1
     f32 avgTps = std::accumulate(tpsArr.begin(), tpsArr.end(), 0.0f) / tpsArr.size();
     f32 avgFps = std::accumulate(fpsArr.begin(), fpsArr.end(), 0.0f) / fpsArr.size();
 
     f32 nww = ImGui::GetFontSize() * 12.0f;
-    f32 nwh = ImGui::GetFontSize() * 9.0f;
+    f32 nwh = ImGui::GetFontSize() * 6.0f;
     ImGui::SetNextWindowSize({ nww, nwh });
-    ImGui::SetNextWindowPos({ MAMR_WINW - nww, MAMR_WINH - nwh });
+    ImGui::SetNextWindowPos({ gb.Gfx().GetWidth() - nww, gb.Gfx().GetHeight() - nwh });
     if (ImGui::Begin("fps", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs)) {
         ImGui::SetWindowFontScale(2.0f);
         ImGui::Text("%02.2f tps", 1.0f / avgTps);
@@ -160,7 +161,6 @@ void App::Draw(f32 dt) {
     }
     ImGui::End();
 
-    #if 1
     nww = ImGui::GetFontSize() * 24.0f;
     nwh = ImGui::GetFontSize() * 6.0f;
     ImGui::SetNextWindowSize({ nww, nwh });
