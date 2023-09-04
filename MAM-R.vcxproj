@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -127,6 +127,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(ProjectDir)ThirdParty\DXTex\bin\Debug\DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,15 +154,141 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(ProjectDir)ThirdParty\DXTex\bin\Release\DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="headers\framework.h" />
+    <ClInclude Include="headers\Globe.h" />
+    <ClInclude Include="headers\Graphics\Bindable\Bindable.h" />
+    <ClInclude Include="headers\Graphics\Bindable\BindableCodex.h" />
+    <ClInclude Include="headers\Graphics\Bindable\Bindables.h" />
+    <ClInclude Include="headers\Graphics\Bindable\Blender.h" />
+    <ClInclude Include="headers\Graphics\Bindable\ConstantBuffers.h" />
+    <ClInclude Include="headers\Graphics\Bindable\IndexBuffer.h" />
+    <ClInclude Include="headers\Graphics\Bindable\InputLayout.h" />
+    <ClInclude Include="headers\Graphics\Bindable\PixelShader.h" />
+    <ClInclude Include="headers\Graphics\Bindable\Rasterizer.h" />
+    <ClInclude Include="headers\Graphics\Bindable\Sampler.h" />
+    <ClInclude Include="headers\Graphics\Bindable\Texture.h" />
+    <ClInclude Include="headers\Graphics\Bindable\Topology.h" />
+    <ClInclude Include="headers\Graphics\Bindable\TransformCBuf.h" />
+    <ClInclude Include="headers\Graphics\Bindable\VertexBuffer.h" />
+    <ClInclude Include="headers\Graphics\Bindable\VertexShader.h" />
+    <ClInclude Include="headers\Graphics\Camera.h" />
+    <ClInclude Include="headers\Graphics\ConstantBufferDyn.h" />
+    <ClInclude Include="headers\Graphics\Drawable\Drawable.h" />
+    <ClInclude Include="headers\Graphics\Drawable\Drawables.h" />
+    <ClInclude Include="headers\Graphics\Drawable\Quad.h" />
+    <ClInclude Include="headers\Graphics\Drawable\QuadBatch.h" />
+    <ClInclude Include="headers\Graphics\DxgiInfoManager.h" />
+    <ClInclude Include="headers\Graphics\Graphics.h" />
+    <ClInclude Include="headers\Graphics\GraphicsMacros.h" />
+    <ClInclude Include="headers\Graphics\Render\FrameController.h" />
+    <ClInclude Include="headers\Graphics\Render\QueueJob.h" />
+    <ClInclude Include="headers\Graphics\Render\QueuePass.h" />
+    <ClInclude Include="headers\Graphics\Render\QueueStep.h" />
+    <ClInclude Include="headers\Graphics\Render\Technique.h" />
+    <ClInclude Include="headers\Graphics\Render\TechniqueProbe.h" />
+    <ClInclude Include="headers\Graphics\Resource\DepthStencil.h" />
+    <ClInclude Include="headers\Graphics\Resource\GraphicsResource.h" />
+    <ClInclude Include="headers\Graphics\Resource\RenderTarget.h" />
+    <ClInclude Include="headers\Graphics\Surface.h" />
+    <ClInclude Include="headers\Graphics\Vertex.h" />
+    <ClInclude Include="headers\ImguiManager.h" />
     <ClInclude Include="headers\MAM-R.h" />
-    <ClInclude Include="headers\Resource.h" />
-    <ClInclude Include="headers\targetver.h" />
+    <ClInclude Include="headers\mamr_defs.h" />
+    <ClInclude Include="headers\MyException.h" />
+    <ClInclude Include="headers\Scene\Scene.h" />
+    <ClInclude Include="headers\Scene\SceneController.h" />
+    <ClInclude Include="headers\Scene\TestScene.h" />
+    <ClInclude Include="headers\Util\DXUtil.h" />
+    <ClInclude Include="headers\Util\Interp.h" />
+    <ClInclude Include="headers\Util\Misc.h" />
+    <ClInclude Include="headers\Util\MyMath.h" />
+    <ClInclude Include="headers\Windows\Callbacks\Callbacks.h" />
+    <ClInclude Include="headers\Windows\Callbacks\Misc.h" />
+    <ClInclude Include="headers\Windows\framework.h" />
+    <ClInclude Include="headers\Windows\Keyboard.h" />
+    <ClInclude Include="headers\Windows\Mouse.h" />
+    <ClInclude Include="headers\Windows\targetver.h" />
+    <ClInclude Include="headers\Windows\Window.h" />
+    <ClInclude Include="headers\Windows\WindowMacros.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ThirdParty\DXTex\BC.h" />
+    <ClInclude Include="ThirdParty\DXTex\BCDirectCompute.h" />
+    <ClInclude Include="ThirdParty\DXTex\d3dx12.h" />
+    <ClInclude Include="ThirdParty\DXTex\DDS.h" />
+    <ClInclude Include="ThirdParty\DXTex\DirectXTex.h" />
+    <ClInclude Include="ThirdParty\DXTex\DirectXTexP.h" />
+    <ClInclude Include="ThirdParty\DXTex\filters.h" />
+    <ClInclude Include="ThirdParty\DXTex\scoped.h" />
+    <ClInclude Include="ThirdParty\imgui\imconfig.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui_internal.h" />
+    <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="ThirdParty\imgui\imstb_textedit.h" />
+    <ClInclude Include="ThirdParty\imgui\imstb_truetype.h" />
+    <ClInclude Include="ThirdParty\TGLib\Instrumentor.h" />
+    <ClInclude Include="ThirdParty\TGLib\TGLib.h" />
+    <ClInclude Include="ThirdParty\TGLib\Timer.h" />
+    <ClInclude Include="ThirdParty\TGLib\Util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Globe.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\Blender.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\ConstantBuffers.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\IndexBuffer.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\InputLayout.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\PixelShader.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\Rasterizer.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\Sampler.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\Texture.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\Topology.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\TransformCBuf.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\VertexBuffer.cpp" />
+    <ClCompile Include="src\Graphics\Bindable\VertexShader.cpp" />
+    <ClCompile Include="src\Graphics\Camera.cpp" />
+    <ClCompile Include="src\Graphics\ConstantBufferDyn.cpp" />
+    <ClCompile Include="src\Graphics\Drawable\Drawable.cpp" />
+    <ClCompile Include="src\Graphics\Drawable\Quad.cpp" />
+    <ClCompile Include="src\Graphics\Drawable\QuadBatch.cpp" />
+    <ClCompile Include="src\Graphics\DxgiInfoManager.cpp" />
+    <ClCompile Include="src\Graphics\Graphics.cpp" />
+    <ClCompile Include="src\Graphics\Render\FrameController.cpp" />
+    <ClCompile Include="src\Graphics\Render\QueueJob.cpp" />
+    <ClCompile Include="src\Graphics\Render\QueuePass.cpp" />
+    <ClCompile Include="src\Graphics\Render\QueueStep.cpp" />
+    <ClCompile Include="src\Graphics\Render\Technique.cpp" />
+    <ClCompile Include="src\Graphics\Render\TechniqueProbe.cpp" />
+    <ClCompile Include="src\Graphics\Resource\DepthStencil.cpp" />
+    <ClCompile Include="src\Graphics\Resource\GraphicsResource.cpp" />
+    <ClCompile Include="src\Graphics\Resource\RenderTarget.cpp" />
+    <ClCompile Include="src\Graphics\Surface.cpp" />
+    <ClCompile Include="src\Graphics\Vertex.cpp" />
+    <ClCompile Include="src\ImguiManager.cpp" />
     <ClCompile Include="src\MAM-R.cpp" />
+    <ClCompile Include="src\MyException.cpp" />
+    <ClCompile Include="src\Scene\Scene.cpp" />
+    <ClCompile Include="src\Scene\SceneController.cpp" />
+    <ClCompile Include="src\Util\DXUtil.cpp" />
+    <ClCompile Include="src\Util\Interp.cpp" />
+    <ClCompile Include="src\Windows\Callbacks\Misc.cpp" />
+    <ClCompile Include="src\Windows\Keyboard.cpp" />
+    <ClCompile Include="src\Windows\Mouse.cpp" />
+    <ClCompile Include="src\Windows\Window.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="ThirdParty\TGLib\Instrumentor.cpp" />
+    <ClCompile Include="ThirdParty\TGLib\Timer.cpp" />
+    <ClCompile Include="ThirdParty\TGLib\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MAM-R.rc" />
@@ -167,6 +296,10 @@
   <ItemGroup>
     <Image Include="MAM-R.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="headers\Util\MyMathLookups.inl" />
+    <None Include="ThirdParty\DXTex\DirectXTex.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
