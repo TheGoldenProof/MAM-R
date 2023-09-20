@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics/DxgiInfoManager.h"
+#include "mamr_defs.h"
 #include "MyException.h"
 #include "TGLib/TGLib.h"
 #include "Windows/framework.h"
@@ -51,6 +52,7 @@ public:
 		std::string reason;
 	};
 public:
+	static constexpr f32 depthScale = MAMR_WINH / 4.0f;
 	u32 drawCalls = 0;
 
 	Graphics(HWND hWnd, u32 width, u32 height);
@@ -62,7 +64,6 @@ public:
 	void EndFrame();
 
 	void BindSwapBuffer() noexcept;
-	void BindSwapBuffer(const DepthStencil& ds) noexcept;
 
 	void ClearBuffer(f32 r, f32 g, f32 b) noexcept;
 	void DrawIndexed(u32 indexCount) dbgexcept;
@@ -71,21 +72,27 @@ public:
 	DirectX::XMMATRIX GetProjection() const noexcept;
 	void SetCamera(DirectX::FXMMATRIX cam) noexcept;
 	DirectX::XMMATRIX GetCamera() const noexcept;
+	void SetDepthTest(bool enable);
+	bool GetDepthTest() const noexcept;
 
 	void OnResize(u32 newWidth, u32 newHeight);
 	u32 GetWidth() const noexcept;
 	u32 GetHeight() const noexcept;
 	f32 GetRefreshRate() const;
 
-	void EnableImGui() noexcept { imguiEnabled = true; }
-	void DisableImGui() noexcept { imguiEnabled = false; }
 	bool IsImguiEnabled() const noexcept { return imguiEnabled; }
+	void SetImguiEnabled(bool val) noexcept { imguiEnabled = val; }
+	bool IsImDebugEnabled() const noexcept { return drawDebug && imguiEnabled; }
+	void SetImDebugEnabled(bool val) noexcept { drawDebug = val; }
 
 private:
 	u32 width, height;
 
 	DirectX::XMMATRIX projection;
 	DirectX::XMMATRIX camera;
+
+	std::unique_ptr<class DepthStencil> pDepthStencil;
+	bool depthTestEnabled = true;
 
 	#ifndef NDEBUG
 	mutable DxgiInfoManager infoManager;
@@ -94,6 +101,8 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
 
 	bool imguiEnabled = true;
+	bool drawDebug = false;
 };

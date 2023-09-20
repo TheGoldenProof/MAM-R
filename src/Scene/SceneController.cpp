@@ -14,21 +14,30 @@ Scene* SceneController::GetActive() {
 	return pActive;
 }
 
-void SceneController::SetActive(const std::string& name) dbgexcept {
+void SceneController::SetActive(Globe& gb, const std::string& name) dbgexcept {
 	auto scene = scenes.find(name);
 	if (scene == scenes.end()) {
 		DEBUG_LOG(("SceneController::SetActive scene does not exist: " + name).c_str());
 		assert(false);
 	} else {
+		if (pActive) pActive->Denit(gb);
 		pActive = scene->second.get();
+		if (pActive) pActive->Init(gb);
 	}
 }
 
+void SceneController::Init(Globe& gb) {
+	if (pActive) pActive->Init(gb);
+}
+
 void SceneController::Update(Globe& gb) {
-	//PROFILE_FUNCTION();
 	if (pActive) pActive->Update(gb);
 }
 
 void SceneController::Draw(Globe& gb) {
 	if (pActive) pActive->Draw(gb);
+}
+
+void SceneController::Denit(Globe& gb) {
+	if (pActive) pActive->Denit(gb);
 }

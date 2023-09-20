@@ -1,7 +1,7 @@
 #include "Graphics/Bindable/PixelShader.h"
 #include "Graphics/GraphicsMacros.h"
 #include "Graphics/Bindable/BindableCodex.h"
-#include "TGLib/Util.h"
+#include "TGLib/TGLib_Util.h"
 
 PixelShader::PixelShader(Graphics& gfx, std::string const& path) {
 	INFOMAN(gfx);

@@ -7,12 +7,14 @@
 class Globe {
 	friend class App;
 private:
+	class Window* pWnd = nullptr;
 	class Graphics* pGraphics = nullptr;
-	//class SceneController* pSceneCtrl = nullptr;
+	class SceneController* pSceneCtrl = nullptr;
 	class FrameController* pFrameCtrl = nullptr;
 	class CameraArr* pCams = nullptr;
 	class Keyboard* pKeyboard = nullptr;
 	class Mouse* pMouse = nullptr;
+	class AudioEngine* pAudio = nullptr;
 
 	TGLib::Timer lifeTimer;
 
@@ -26,12 +28,14 @@ private:
 	f32 targetFPS = 0; // filled by vsync
 	f32 targetFdt = 0;
 public:
+	Window& Wnd() const { return *pWnd; }
 	Graphics& Gfx() const { return *pGraphics; }
-	//SceneController& SceneCtrl() const { return *pSceneCtrl; }
+	SceneController& SceneCtrl() const { return *pSceneCtrl; }
 	FrameController& FrameCtrl() const { return *pFrameCtrl; }
 	CameraArr& Cams() const { return *pCams; }
 	Keyboard& Kbd() const { return *pKeyboard; }
 	Mouse& Mouse() const { return *pMouse; }
+	AudioEngine& Audio() const { return *pAudio; }
 
 	f32 LifeTime() const noexcept { return lifeTimer.Peek(); }
 

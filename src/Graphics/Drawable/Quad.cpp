@@ -3,61 +3,7 @@
 #include "Util/MyMath.h"
 #include "imgui/imgui.h"
 
-Quad::Quad(Graphics& gfx, const QuadDesc& desc) // some of the least favorite code ive written
-	: Quad(gfx, desc, std::move(desc.texture.front() == '@'? 
-		static_cast<std::shared_ptr<Texture>>(RenderTargetTexture::Resolve(gfx, desc.texture, 0))
-		: static_cast<std::shared_ptr<Texture>>(SurfaceTexture::Resolve(gfx, desc.texture, 0)))) {}
-
-Quad::Quad(Graphics& gfx, const QuadDesc& desc, std::shared_ptr<Texture> pTex)
-	: uniqueName(desc.uniqueName) {
-	using Type = Vtx::VertexLayout::ElementType;
-
-	f32 sizeW = desc.size.x;
-	f32 sizeH = desc.size.y;
-	if (pTex->IsErrored()) {
-		sizeW = 64.0f;
-		sizeH = 64.0f;
-	} else if (desc.sizeMode == SIZE_MODE_SCALE) {
-		sizeW *= pTex->GetWidth() * desc.uvSize.x;
-		sizeH *= pTex->GetHeight() * desc.uvSize.y;
-	}
-
-	Vtx::VertexLayout l;
-	l.Append(Vtx::VertexLayout::Position3D);
-	l.Append(Vtx::VertexLayout::Texture2D);
-	Vtx::VertexBuffer vbuf(l, 4);
-	vbuf[0].Attr<Type::Position3D>() = {-sizeW/2,  sizeH/2, 0};
-	vbuf[1].Attr<Type::Position3D>() = { sizeW/2,  sizeH/2, 0};
-	vbuf[2].Attr<Type::Position3D>() = {-sizeW/2, -sizeH/2, 0};
-	vbuf[3].Attr<Type::Position3D>() = { sizeW/2, -sizeH/2, 0};
-	vbuf[0].Attr<Type::Texture2D>() = {desc.uvOffset.x, desc.uvOffset.y};
-	vbuf[1].Attr<Type::Texture2D>() = {desc.uvOffset.x + desc.uvSize.x, desc.uvOffset.y};
-	vbuf[2].Attr<Type::Texture2D>() = {desc.uvOffset.x, desc.uvOffset.y + desc.uvSize.y};
-	vbuf[3].Attr<Type::Texture2D>() = {desc.uvOffset.x + desc.uvSize.x, desc.uvOffset.y + desc.uvSize.y };
-
-	const std::string geometryTag = "$quad." + std::to_string(sizeW) + "x" + std::to_string(sizeH);
-	pVerticies = VertexBuffer::Resolve(gfx, geometryTag + "." + uniqueName, std::move(vbuf));
-	std::vector<u16> indicies{0,1,2,1,3,2};
-	pIndicies = IndexBuffer::Resolve(gfx, geometryTag, indicies.data(), indicies.size());
-	pTopology = Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	Technique main("Main");
-	QueueStep only(desc.layer);
-	only.AddBindable(std::move(pTex));
-	only.AddBindable(Sampler::Resolve(gfx, desc.filter));
-
-	auto pVs = VertexShader::Resolve(gfx, desc.vertexShader);
-	auto pVsbc = pVs->GetBytecode();
-	only.AddBindable(std::move(pVs));
-
-	only.AddBindable(PixelShader::Resolve(gfx, desc.pixelShader));
-
-	only.AddBindable(InputLayout::Resolve(gfx, l, pVsbc));
-	only.AddBindable(std::make_shared<TransformCBuf>(gfx));
-
-	main.AddStep(std::move(only));
-	AddTechnique(std::move(main));
-}
+Quad::Quad(const std::string& name) : uniqueName(name) {}
 
 void Quad::SetPos(DirectX::XMFLOAT3 pos_) noexcept {
 	pos = pos_;
@@ -121,4 +67,102 @@ void Quad::SpawnControlWindow(Graphics& gfx, const std::string& name) noexcept {
 		Accept(probe);
 	}
 	ImGui::End();
+}
+
+QuadTextured::QuadTextured(Graphics& gfx, const QuadDesc& desc) // some of the least favorite code ive written
+	: QuadTextured(gfx, desc, std::move(desc.texture.front() == '@' ?
+		static_cast<std::shared_ptr<Texture>>(RenderTargetTexture::Resolve(gfx, desc.texture, 0))
+		: static_cast<std::shared_ptr<Texture>>(SurfaceTexture::Resolve(gfx, desc.texture, 0)))) {
+}
+
+QuadTextured::QuadTextured(Graphics& gfx, const QuadDesc& desc, std::shared_ptr<Texture> pTex)
+	: Quad(desc.uniqueName) {
+	using Type = Vtx::VertexLayout::ElementType;
+
+	f32 sizeW = desc.size.x;
+	f32 sizeH = desc.size.y;
+	if (pTex->IsErrored()) {
+		sizeW = 64.0f;
+		sizeH = 64.0f;
+	} else if (desc.sizeMode == SIZE_MODE_SCALE) {
+		sizeW *= pTex->GetWidth() * desc.uvSize.x;
+		sizeH *= pTex->GetHeight() * desc.uvSize.y;
+	}
+
+	Vtx::VertexLayout l;
+	l.Append(Vtx::VertexLayout::Position3D);
+	l.Append(Vtx::VertexLayout::Texture2D);
+	Vtx::VertexBuffer vbuf(l, 4);
+	vbuf[0].Attr<Type::Position3D>() = { -sizeW / 2,  sizeH / 2, 0 };
+	vbuf[1].Attr<Type::Position3D>() = { sizeW / 2,  sizeH / 2, 0 };
+	vbuf[2].Attr<Type::Position3D>() = { -sizeW / 2, -sizeH / 2, 0 };
+	vbuf[3].Attr<Type::Position3D>() = { sizeW / 2, -sizeH / 2, 0 };
+	vbuf[0].Attr<Type::Texture2D>() = { desc.uvOffset.x, desc.uvOffset.y };
+	vbuf[1].Attr<Type::Texture2D>() = { desc.uvOffset.x + desc.uvSize.x, desc.uvOffset.y };
+	vbuf[2].Attr<Type::Texture2D>() = { desc.uvOffset.x, desc.uvOffset.y + desc.uvSize.y };
+	vbuf[3].Attr<Type::Texture2D>() = { desc.uvOffset.x + desc.uvSize.x, desc.uvOffset.y + desc.uvSize.y };
+
+	const std::string geometryTag = "$quadT." + std::to_string(sizeW) + "x" + std::to_string(sizeH);
+	pVerticies = VertexBuffer::Resolve(gfx, geometryTag + "." + uniqueName, std::move(vbuf));
+	std::vector<u16> indicies{ 0,1,2,1,3,2 };
+	pIndicies = IndexBuffer::Resolve(gfx, geometryTag, indicies.data(), indicies.size());
+	pTopology = Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	Technique main("Main");
+	QueueStep only(desc.layer);
+	only.AddBindable(std::move(pTex));
+	only.AddBindable(Sampler::Resolve(gfx, desc.filter));
+
+	auto pVs = VertexShader::Resolve(gfx, desc.vertexShader);
+	auto pVsbc = pVs->GetBytecode();
+	only.AddBindable(std::move(pVs));
+
+	only.AddBindable(PixelShader::Resolve(gfx, desc.pixelShader));
+
+	only.AddBindable(InputLayout::Resolve(gfx, l, pVsbc));
+	only.AddBindable(std::make_shared<TransformCBuf>(gfx));
+
+	main.AddStep(std::move(only));
+	AddTechnique(std::move(main));
+}
+
+QuadColored::QuadColored(Graphics& gfx, const QuadDesc& desc) : Quad(desc.uniqueName) {
+	using Type = Vtx::VertexLayout::ElementType;
+
+	f32 sizeW = desc.size.x;
+	f32 sizeH = desc.size.y;
+
+	Vtx::VertexLayout l;
+	l.Append(Vtx::VertexLayout::Position3D);
+	l.Append(Vtx::VertexLayout::Byte4Color);
+	Vtx::VertexBuffer vbuf(l, 4);
+	vbuf[0].Attr<Type::Position3D>() = { -sizeW / 2,  sizeH / 2, 0 };
+	vbuf[1].Attr<Type::Position3D>() = { sizeW / 2,  sizeH / 2, 0 };
+	vbuf[2].Attr<Type::Position3D>() = { -sizeW / 2, -sizeH / 2, 0 };
+	vbuf[3].Attr<Type::Position3D>() = { sizeW / 2, -sizeH / 2, 0 };
+	for (u32 i = 0; i < 4; i++) {
+		auto color = desc.colors[desc.singleColor ? 0 : i];
+		vbuf[i].Attr<Type::Byte4Color>() = { color[0], color[1], color[2], color[3] };
+	}
+
+	const std::string geometryTag = "$quadC." + std::to_string(sizeW) + "x" + std::to_string(sizeH);
+	pVerticies = VertexBuffer::Resolve(gfx, geometryTag + "." + uniqueName, std::move(vbuf));
+	std::vector<u16> indicies{ 0,1,2,1,3,2 };
+	pIndicies = IndexBuffer::Resolve(gfx, geometryTag, indicies.data(), indicies.size());
+	pTopology = Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	Technique main("Main");
+	QueueStep only(desc.layer);
+
+	auto pVs = VertexShader::Resolve(gfx, desc.vertexShader);
+	auto pVsbc = pVs->GetBytecode();
+	only.AddBindable(std::move(pVs));
+
+	only.AddBindable(PixelShader::Resolve(gfx, desc.pixelShader));
+
+	only.AddBindable(InputLayout::Resolve(gfx, l, pVsbc));
+	only.AddBindable(std::make_shared<TransformCBuf>(gfx));
+
+	main.AddStep(std::move(only));
+	AddTechnique(std::move(main));
 }

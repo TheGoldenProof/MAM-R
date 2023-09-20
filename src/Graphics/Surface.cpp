@@ -1,5 +1,5 @@
 #include "Graphics/Surface.h"
-#include "TGLib/Util.h"
+#include "TGLib/TGLib_Util.h"
 #include "Windows/Window.h"
 #include <algorithm>
 #include <cassert>

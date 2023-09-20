@@ -3,32 +3,54 @@
 
 class Quad : public Drawable {
 public:
-	struct QuadDesc {
-		std::string uniqueName;
-		std::string texture;
-		DirectX::XMFLOAT2 size = { 1.0f, 1.0f };
-		usize layer = 0;
-		SIZE_MODE sizeMode = SIZE_MODE_SCALE;
-		DirectX::XMFLOAT2 uvOffset = { 0, 0 };
-		DirectX::XMFLOAT2 uvSize = { 1.0f, 1.0f };
-		D3D11_FILTER filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		std::string vertexShader = "VS_Texture.cso";
-		std::string pixelShader = "PS_Texture.cso";
-	};
-public:
-	Quad(Graphics& gfx, const QuadDesc& desc);
-	Quad(Graphics& gfx, const QuadDesc& desc, std::shared_ptr<class Texture> pTex);
 	void SetPos(DirectX::XMFLOAT3 pos) noexcept;
 	void SetRotation(f32 x, f32 y, f32 z) noexcept;
 	void SetScale(f32 w, f32 h) noexcept;
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 	void SpawnControlWindow(Graphics& gfx, const std::string& name) noexcept;
-private:
+protected:
+	Quad(const std::string& name);
+protected:
 	const std::string uniqueName;
+private:
 	DirectX::XMFLOAT3 pos{0.0f, 0.0f, 0.0f};
 	f32 pitch = 0;
 	f32 yaw = 0;
 	f32 roll = 0;
 	f32 scaleW = 1.0f;
 	f32 scaleH = 1.0f;
+};
+
+class QuadTextured : public Quad {
+public:
+	struct QuadDesc {
+		std::string uniqueName;
+		DirectX::XMFLOAT2 size = { 1.0f, 1.0f };
+		usize layer = 0;
+		std::string vertexShader = "VS_Texture.cso";
+		std::string pixelShader = "PS_Texture.cso";
+		std::string texture;
+		SIZE_MODE sizeMode = SIZE_MODE_SCALE;
+		DirectX::XMFLOAT2 uvOffset = { 0, 0 };
+		DirectX::XMFLOAT2 uvSize = { 1.0f, 1.0f };
+		D3D11_FILTER filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	};
+public:
+	QuadTextured(Graphics& gfx, const QuadDesc& desc);
+	QuadTextured(Graphics& gfx, const QuadDesc& desc, std::shared_ptr<class Texture> pTex);
+};
+
+class QuadColored : public Quad {
+public:
+	struct QuadDesc {
+		std::string uniqueName;
+		DirectX::XMFLOAT2 size = { 1.0f, 1.0f };
+		usize layer = 0;
+		std::string vertexShader = "Colored_VS.cso";
+		std::string pixelShader = "Colored_PS.cso";
+		bool singleColor = true;
+		u8 colors[4][4] = {{127, 127, 127, 127}, {}, {}, {}};
+	};
+public:
+	QuadColored(Graphics& gfx, const QuadDesc& desc);
 };

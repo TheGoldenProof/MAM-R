@@ -1,7 +1,7 @@
 #include "Graphics/Bindable/VertexShader.h"
 #include "Graphics/GraphicsMacros.h"
 #include "Graphics/Bindable/BindableCodex.h"
-#include "TGLib/Util.h"
+#include "TGLib/TGLib_Util.h"
 
 VertexShader::VertexShader(Graphics& gfx, std::string const& path) : path(path) {
 	INFOMAN(gfx);

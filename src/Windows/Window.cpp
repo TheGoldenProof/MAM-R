@@ -2,9 +2,11 @@
 #include "mamr_defs.h"
 #include "../resource.h"
 #include "Windows\Callbacks\Callbacks.h"
+#include "Windows\DialogEventHandler.h"
 #include "Windows/Window.h"
 #include "Windows/WindowMacros.h"
 #include <sstream>
+#include <ShlObj.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -23,7 +25,7 @@ Window::WinAPIClass::WinAPIClass() noexcept : hInstance(GetModuleHandle(nullptr)
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MAMR));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = nullptr;
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_MAMR);
+    wcex.lpszMenuName   = nullptr; //MAKEINTRESOURCEW(IDC_MAMR);
     wcex.lpszClassName  = wndClassName;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -38,9 +40,9 @@ LPCWSTR Window::WinAPIClass::GetName() noexcept { return wndClassName; }
 HINSTANCE Window::WinAPIClass::GetInstance() noexcept { return wndClass.hInstance; }
 HACCEL Window::WinAPIClass::GetAccelTable() noexcept { return wndClass.hAccelTable; }
 
-Window::Window(i32 width, i32 height, LPCWSTR title) : width(width), height(height) {
-    RECT wr{128, 128, 128+width, 128+height};
-    LONG wstyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_THICKFRAME; 
+Window::Window(i32 width, i32 height, LPCWSTR title) : width(width), height(height), windowedRect{128, 128, 128+width, 128+height} {
+    RECT& wr = windowedRect;
+    LONG wstyle = windowedStyle; 
 
     if (AdjustWindowRect(&wr, wstyle , FALSE) == 0) throw MYWND_LAST_EXCEPT();
 
@@ -68,6 +70,10 @@ Window::~Window() {
     }*/
 }
 
+HWND Window::GetHWND() const noexcept {
+    return hWnd;
+}
+
 void Window::SetTitle(LPCWSTR title) {
     if (SetWindowText(hWnd, title) == 0) throw MYWND_LAST_EXCEPT();
 }
@@ -92,9 +98,91 @@ Graphics& Window::Gfx() {
 }
 
 void Window::OnResize(u32 width_, u32 height_) {
+    if (width_ == 0 || height_ == 0) return;
     width = static_cast<i32>(width_);
     height = static_cast<i32>(height_);
     if (pGfx) Gfx().OnResize(width_, height_);
+}
+
+void Window::SetBorderlessFullscreen(bool val) {
+    if (val == isFullscreen) return;
+    isFullscreen = val;
+    if (val) {
+        GetWindowRect(hWnd, &windowedRect);
+        u32 dpi = GetDpiForWindow(hWnd);
+        SetWindowLongPtr(hWnd, GWL_STYLE, borderlessStyle);
+        SetWindowPos(hWnd, HWND_TOP, 0, 0, GetSystemMetricsForDpi(SM_CXSCREEN, dpi), GetSystemMetricsForDpi(SM_CYSCREEN, dpi), SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+    } else {
+        SetWindowLongPtr(hWnd, GWL_STYLE, windowedStyle);
+        SetWindowPos(hWnd, HWND_TOP, windowedRect.left, windowedRect.top, windowedRect.right - windowedRect.left, windowedRect.bottom - windowedRect.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+    }
+}
+
+bool Window::IsFullscreen() const noexcept {
+    return isFullscreen;
+}
+
+std::wstring Window::OpenFile(const std::vector<std::pair<const wchar_t*, const wchar_t*>>& saveTypes, u32 fileTypeIndex, const wchar_t* defaultExtension) {
+    IFileDialog* pfd = nullptr;
+    HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd));
+    if (SUCCEEDED(hr)) {
+
+        IFileDialogEvents* pfde = nullptr;
+        hr = DialogEventHandler::CreateInstance(IID_PPV_ARGS(&pfde));
+        if (SUCCEEDED(hr)) {
+
+            DWORD dwCookie;
+            hr = pfd->Advise(pfde, &dwCookie);
+            if (SUCCEEDED(hr)) {
+
+                DWORD dwFlags;
+                hr = pfd->GetOptions(&dwFlags);
+                if (SUCCEEDED(hr)) {
+
+                    hr = pfd->SetOptions(dwFlags | FOS_FORCEFILESYSTEM);
+                    if (SUCCEEDED(hr)) {
+
+                        hr = pfd->SetFileTypes(static_cast<u32>(saveTypes.size()), reinterpret_cast<const COMDLG_FILTERSPEC*>(saveTypes.data()));
+                        if (SUCCEEDED(hr)) {
+
+                            hr = pfd->SetFileTypeIndex(fileTypeIndex);
+                            if (SUCCEEDED(hr)) {
+
+                                hr = pfd->SetDefaultExtension(defaultExtension);
+                                if (SUCCEEDED(hr)) {
+
+                                    hr = pfd->Show(nullptr);
+                                    if (SUCCEEDED(hr)) {
+
+                                        IShellItem* pResult;
+                                        hr = pfd->GetResult(&pResult);
+                                        if (SUCCEEDED(hr)) {
+
+                                            PWSTR pFilePath = nullptr;
+                                            hr = pResult->GetDisplayName(SIGDN_FILESYSPATH, &pFilePath);
+                                            if (SUCCEEDED(hr)) {
+
+                                                std::wstring ret(pFilePath);
+                                                CoTaskMemFree(pFilePath);
+                                                return ret;
+
+                                            }
+                                            pResult->Release();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                pfd->Unadvise(dwCookie);
+            }
+            pfde->Release();
+        }
+        pfd->Release();
+    }
+
+    return L"";
 }
 
 LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {

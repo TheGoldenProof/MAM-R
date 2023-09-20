@@ -6,6 +6,7 @@
 #include "Graphics/Render/FrameController.h"
 #include "Graphics/Resource/RenderTarget.h"
 #include "Util/DXUtil.h"
+#include "Util\MyMath.h"
 
 FrameController::FrameController(Graphics& gfx) {
 	UNREFERENCED_PARAMETER(gfx);
@@ -36,10 +37,27 @@ void FrameController::Execute(Globe& gb) dbgexcept {
 	Graphics& gfx = gb.Gfx();
 
 	//ds.Clear(gfx);
+
+	const auto currentCamName = gb.Cams().GetActiveCamera().transform([](const auto& camRef) { return camRef.get().GetName(); });
+	const bool depthTestEnabled = gfx.GetDepthTest();
+
+	constexpr f32 nearZ = 1.0f / 64;
+	const f32 aspect = static_cast<f32>(gb.Gfx().GetWidth()) / static_cast<f32>(gb.Gfx().GetHeight());
+	auto proj = DirectX::XMMatrixPerspectiveFovLH(Math::to_rad(90.0f), aspect, nearZ, 65536.0f);
+	gb.Gfx().SetProjection(std::move(proj));
 	
 	gfx.BindSwapBuffer();
 	//gfx.SetProjection(projF);
-	for (u32 i = 0; i < 32; i++) passes[i].Execute(gfx);
+	for (u32 i = 0; i < 16; i++) passes[i].Execute(gfx);
+
+	gb.Cams().SetActive("HUD cam");
+	gb.Cams().BindActive(gb.Gfx());
+	gfx.SetProjection(DXUtil::CustomOrthoProj(static_cast<f32>(gfx.GetWidth()), static_cast<f32>(gfx.GetHeight())));
+	gfx.SetDepthTest(false);
+	for (u32 i = 16; i < 32; i++) passes[i].Execute(gfx);
+
+	if (currentCamName) gb.Cams().SetActive(currentCamName.value());
+	if (depthTestEnabled) gfx.SetDepthTest(true);
 }
 
 void FrameController::Reset() noexcept {

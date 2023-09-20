@@ -86,9 +86,12 @@ bool Scene::ReadQuad(Graphics& gfx, std::ifstream& file) {
 	if (vs == "n") vs = "VS_Texture.cso";
 	if (ps == "n") ps = "PS_Texture.cso";
 
-	auto quad = std::make_unique<Quad>(gfx,
-		Quad::QuadDesc{name +"_q" + std::to_string(drawables.size()), tex, {sizeX, sizeY}, layer, (SIZE_MODE)sizeMode,
-		{offsetU, offsetV}, {sizeU, sizeV}, (D3D11_FILTER)filter, vs, ps });
+	auto quad = std::make_unique<QuadTextured>(gfx,
+		QuadTextured::QuadDesc{
+			name +"_q" + std::to_string(drawables.size()), 
+			{sizeX, sizeY}, layer, vs, ps, 
+			tex, (SIZE_MODE)sizeMode, {offsetU, offsetV}, {sizeU, sizeV}, (D3D11_FILTER)filter 
+		});
 	quad->SetPos({ posX, posY, 0.0f });
 
 	drawables.insert(std::move(quad));

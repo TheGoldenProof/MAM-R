@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
@@ -26,19 +18,6 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -57,12 +36,6 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -70,44 +43,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)headers;$(ProjectDir)ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <FloatingPointModel>Fast</FloatingPointModel>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)headers;$(ProjectDir)ThirdParty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <FloatingPointModel>Fast</FloatingPointModel>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
@@ -121,11 +56,12 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableSpecificWarnings>4201</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)ThirdParty\DXTex\bin\Debug\DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)ThirdParty\DXTex\bin\Debug\DirectXTex.lib;%(AdditionalDependencies);Shlwapi.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -146,13 +82,14 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4201</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)ThirdParty\DXTex\bin\Release\DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)ThirdParty\DXTex\bin\Release\DirectXTex.lib;%(AdditionalDependencies);Shlwapi.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -198,9 +135,16 @@
     <ClInclude Include="headers\ImguiManager.h" />
     <ClInclude Include="headers\MAM-R.h" />
     <ClInclude Include="headers\mamr_defs.h" />
+    <ClInclude Include="headers\MIDI\RawMidi.h" />
+    <ClInclude Include="headers\MIDI\Enums.h" />
+    <ClInclude Include="headers\MIDI\Parser\MidiEvent.inl" />
+    <ClInclude Include="headers\MIDI\Parser\MTrkEvent.h" />
+    <ClInclude Include="headers\MIDI\Util.h" />
     <ClInclude Include="headers\MyException.h" />
+    <ClInclude Include="headers\Scene\MidiScene.h" />
     <ClInclude Include="headers\Scene\Scene.h" />
     <ClInclude Include="headers\Scene\SceneController.h" />
+    <ClInclude Include="headers\Scene\Scenes.h" />
     <ClInclude Include="headers\Scene\TestScene.h" />
     <ClInclude Include="headers\Util\DXUtil.h" />
     <ClInclude Include="headers\Util\Interp.h" />
@@ -208,6 +152,7 @@
     <ClInclude Include="headers\Util\MyMath.h" />
     <ClInclude Include="headers\Windows\Callbacks\Callbacks.h" />
     <ClInclude Include="headers\Windows\Callbacks\Misc.h" />
+    <ClInclude Include="headers\Windows\DialogEventHandler.h" />
     <ClInclude Include="headers\Windows\framework.h" />
     <ClInclude Include="headers\Windows\Keyboard.h" />
     <ClInclude Include="headers\Windows\Mouse.h" />
@@ -215,6 +160,8 @@
     <ClInclude Include="headers\Windows\Window.h" />
     <ClInclude Include="headers\Windows\WindowMacros.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="headers\MIDI\Parser\Chunks.h" />
+    <ClInclude Include="headers\MIDI\CookedMidi.h" />
     <ClInclude Include="ThirdParty\DXTex\BC.h" />
     <ClInclude Include="ThirdParty\DXTex\BCDirectCompute.h" />
     <ClInclude Include="ThirdParty\DXTex\d3dx12.h" />
@@ -231,10 +178,13 @@
     <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h" />
     <ClInclude Include="ThirdParty\imgui\imstb_textedit.h" />
     <ClInclude Include="ThirdParty\imgui\imstb_truetype.h" />
+    <ClInclude Include="ThirdParty\miniaudio\AudioEngine.h" />
+    <ClInclude Include="ThirdParty\miniaudio\miniaudio.h" />
+    <ClInclude Include="ThirdParty\miniaudio\Sound.h" />
     <ClInclude Include="ThirdParty\TGLib\Instrumentor.h" />
     <ClInclude Include="ThirdParty\TGLib\TGLib.h" />
     <ClInclude Include="ThirdParty\TGLib\Timer.h" />
-    <ClInclude Include="ThirdParty\TGLib\Util.h" />
+    <ClInclude Include="ThirdParty\TGLib\TGLib_Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Globe.cpp" />
@@ -270,12 +220,23 @@
     <ClCompile Include="src\Graphics\Vertex.cpp" />
     <ClCompile Include="src\ImguiManager.cpp" />
     <ClCompile Include="src\MAM-R.cpp" />
+    <ClCompile Include="src\MIDI\CookedMidi.cpp" />
+    <ClCompile Include="src\MIDI\RawMidi.cpp" />
+    <ClCompile Include="src\MIDI\Parser\Chunks.cpp" />
+    <ClCompile Include="src\MIDI\Parser\MetaEvent.cpp" />
+    <ClCompile Include="src\MIDI\Parser\MidiEvent.cpp" />
+    <ClCompile Include="src\MIDI\Parser\MTrkEvent.cpp" />
+    <ClCompile Include="src\MIDI\Util.cpp" />
+    <ClCompile Include="src\MIDI\Parser\SysexEvent.cpp" />
     <ClCompile Include="src\MyException.cpp" />
+    <ClCompile Include="src\Scene\MidiScene.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneController.cpp" />
+    <ClCompile Include="src\Scene\TestScene.cpp" />
     <ClCompile Include="src\Util\DXUtil.cpp" />
     <ClCompile Include="src\Util\Interp.cpp" />
     <ClCompile Include="src\Windows\Callbacks\Misc.cpp" />
+    <ClCompile Include="src\Windows\DialogEventHandler.cpp" />
     <ClCompile Include="src\Windows\Keyboard.cpp" />
     <ClCompile Include="src\Windows\Mouse.cpp" />
     <ClCompile Include="src\Windows\Window.cpp" />
@@ -286,9 +247,12 @@
     <ClCompile Include="ThirdParty\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="ThirdParty\miniaudio\AudioEngine.cpp" />
+    <ClCompile Include="ThirdParty\miniaudio\miniaudio.c" />
+    <ClCompile Include="ThirdParty\miniaudio\Sound.cpp" />
     <ClCompile Include="ThirdParty\TGLib\Instrumentor.cpp" />
     <ClCompile Include="ThirdParty\TGLib\Timer.cpp" />
-    <ClCompile Include="ThirdParty\TGLib\Util.cpp" />
+    <ClCompile Include="ThirdParty\TGLib\TGLib_Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MAM-R.rc" />
@@ -300,6 +264,20 @@
   <ItemGroup>
     <None Include="headers\Util\MyMathLookups.inl" />
     <None Include="ThirdParty\DXTex\DirectXTex.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\Colored_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)shaders\%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\Colored_VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)shaders\%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

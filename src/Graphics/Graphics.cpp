@@ -76,11 +76,12 @@ Graphics::Graphics(HWND hWnd, u32 width, u32 height) : width(width), height(heig
 	D3D11_DEPTH_STENCIL_DESC dsd{};
 	dsd.DepthEnable = TRUE;
 	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsd.DepthFunc = D3D11_COMPARISON_ALWAYS;
-	wrl::ComPtr<ID3D11DepthStencilState> pDSState;
+	dsd.DepthFunc = D3D11_COMPARISON_LESS;
 	GFX_THROW_INFO(pDevice->CreateDepthStencilState(&dsd, &pDSState));
 
 	pContext->OMSetDepthStencilState(pDSState.Get(), 1);
+
+	pDepthStencil = std::make_unique<DepthStencil>(*this, width, height);
 
 	D3D11_VIEWPORT vp{};
 	vp.Width = MAMR_WINW;
@@ -127,7 +128,7 @@ void Graphics::EndFrame() {
 }
 
 void Graphics::BindSwapBuffer() noexcept {
-	pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), nullptr);
+	pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDepthStencil->pDepthStencilView.Get());
 
 	D3D11_VIEWPORT vp;
 	vp.Width = (f32)width;
@@ -139,13 +140,10 @@ void Graphics::BindSwapBuffer() noexcept {
 	pContext->RSSetViewports(1, &vp);
 }
 
-void Graphics::BindSwapBuffer(const DepthStencil& ds) noexcept {
-	pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), ds.pDepthStencilView.Get());
-}
-
 void Graphics::ClearBuffer(f32 r, f32 g, f32 b) noexcept {
 	const f32 color[]{r, g, b, 1.0f};
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
+	pDepthStencil->Clear(*this);
 }
 
 void Graphics::DrawIndexed(u32 indexCount) dbgexcept {
@@ -160,6 +158,23 @@ void Graphics::SetCamera(DirectX::FXMMATRIX cam) noexcept { camera = cam; }
 
 DirectX::XMMATRIX Graphics::GetCamera() const noexcept { return camera; }
 
+void Graphics::SetDepthTest(bool enable) {
+	depthTestEnabled = enable;
+	HRESULT hr;
+
+	D3D11_DEPTH_STENCIL_DESC dsd{};
+	dsd.DepthEnable = enable;
+	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsd.DepthFunc = D3D11_COMPARISON_LESS;
+	GFX_THROW_INFO(pDevice->CreateDepthStencilState(&dsd, &pDSState));
+
+	pContext->OMSetDepthStencilState(pDSState.Get(), 1);
+}
+
+bool Graphics::GetDepthTest() const noexcept {
+	return depthTestEnabled;
+}
+
 void Graphics::OnResize(u32 newWidth, u32 newHeight) {
 	width = newWidth;
 	height = newHeight;
@@ -173,6 +188,8 @@ void Graphics::OnResize(u32 newWidth, u32 newHeight) {
 	wrl::ComPtr<ID3D11Resource> pBackBuffer;
 	GFX_THROW_INFO(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
 	GFX_THROW_INFO(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, pTarget.GetAddressOf()));
+
+	pDepthStencil = std::make_unique<DepthStencil>(*this, width, height);
 }
 
 u32 Graphics::GetWidth() const noexcept { return width; }

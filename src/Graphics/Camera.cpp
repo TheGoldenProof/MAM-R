@@ -204,8 +204,7 @@ void CameraArr::SetActive(const std::string& name) {
 	selected = name;
 }
 
-void CameraArr::SetActiveAndBind(Graphics& gfx, const std::string& name) {
-	SetActive(name);
+void CameraArr::BindActive(Graphics& gfx) {
 	if (auto cam = GetActiveCamera(); cam) cam.value().get().Bind(gfx);
 }
 

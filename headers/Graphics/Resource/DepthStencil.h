@@ -8,6 +8,7 @@ public:
 	DepthStencil(Graphics& gfx, u32 width, u32 height);
 	void BindDepthStencil(Graphics& gfx) const noexcept;
 	void Clear(Graphics& gfx) const noexcept;
-private:
+
+public:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView;
 };

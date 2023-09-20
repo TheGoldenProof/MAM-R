@@ -15,7 +15,6 @@ private:
 	static Vtx::VertexLayout MakeFullscreenQuadLayout();
 private:
 	std::array<QueuePass, 32> passes;
-	//DepthStencil ds;
 	//std::shared_ptr<class RenderTargetTexture> pRt0;
 
 	//Quad qrt0;
