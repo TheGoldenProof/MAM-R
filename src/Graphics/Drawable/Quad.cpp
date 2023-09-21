@@ -5,14 +5,26 @@
 
 Quad::Quad(const std::string& name) : uniqueName(name) {}
 
+DirectX::XMFLOAT3 Quad::GetPos() const noexcept {
+	return pos;
+}
+
 void Quad::SetPos(DirectX::XMFLOAT3 pos_) noexcept {
 	pos = pos_;
+}
+
+DirectX::XMFLOAT3 Quad::GetRotation() const noexcept {
+	return { pitch, yaw, roll };
 }
 
 void Quad::SetRotation(f32 pitch_, f32 yaw_, f32 roll_) noexcept {
 	pitch = pitch_;
 	yaw = yaw_;
 	roll = roll_;
+}
+
+DirectX::XMFLOAT2 Quad::GetScale() const noexcept {
+	return {scaleW, scaleH};
 }
 
 void Quad::SetScale(f32 w, f32 h) noexcept {
@@ -134,7 +146,7 @@ QuadColored::QuadColored(Graphics& gfx, const QuadDesc& desc) : Quad(desc.unique
 
 	Vtx::VertexLayout l;
 	l.Append(Vtx::VertexLayout::Position3D);
-	l.Append(Vtx::VertexLayout::Byte4Color);
+	l.Append(Vtx::VertexLayout::Float4Color);
 	Vtx::VertexBuffer vbuf(l, 4);
 	vbuf[0].Attr<Type::Position3D>() = { -sizeW / 2,  sizeH / 2, 0 };
 	vbuf[1].Attr<Type::Position3D>() = { sizeW / 2,  sizeH / 2, 0 };
@@ -142,7 +154,7 @@ QuadColored::QuadColored(Graphics& gfx, const QuadDesc& desc) : Quad(desc.unique
 	vbuf[3].Attr<Type::Position3D>() = { sizeW / 2, -sizeH / 2, 0 };
 	for (u32 i = 0; i < 4; i++) {
 		auto color = desc.colors[desc.singleColor ? 0 : i];
-		vbuf[i].Attr<Type::Byte4Color>() = { color[0], color[1], color[2], color[3] };
+		vbuf[i].Attr<Type::Float4Color>() = { color[0], color[1], color[2], color[3] };
 	}
 
 	const std::string geometryTag = "$quadC." + std::to_string(sizeW) + "x" + std::to_string(sizeH);

@@ -1,11 +1,19 @@
 #pragma once
 #include "Graphics\Drawable\Drawable.h"
+#include <array>
 
 class Quad : public Drawable {
 public:
+	DirectX::XMFLOAT3 GetPos() const noexcept;
+	void SetPos(f32 x, f32 y, f32 z) noexcept { SetPos({ x, y, z }); }
 	void SetPos(DirectX::XMFLOAT3 pos) noexcept;
+	DirectX::XMFLOAT3 GetRotation() const noexcept;
 	void SetRotation(f32 x, f32 y, f32 z) noexcept;
+	void SetRotation(DirectX::XMFLOAT3 rot) noexcept { SetRotation(rot.x, rot.y, rot.z); }
+	DirectX::XMFLOAT2 GetScale() const noexcept;
 	void SetScale(f32 w, f32 h) noexcept;
+	void SetScale(DirectX::XMFLOAT2 scl) noexcept { SetScale(scl.x, scl.y); }
+
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 	void SpawnControlWindow(Graphics& gfx, const std::string& name) noexcept;
 protected:
@@ -43,13 +51,14 @@ public:
 class QuadColored : public Quad {
 public:
 	struct QuadDesc {
+		using colorArr_t = std::array<std::array<f32, 4>, 4>;
 		std::string uniqueName;
 		DirectX::XMFLOAT2 size = { 1.0f, 1.0f };
 		usize layer = 0;
 		std::string vertexShader = "Colored_VS.cso";
 		std::string pixelShader = "Colored_PS.cso";
 		bool singleColor = true;
-		u8 colors[4][4] = {{127, 127, 127, 127}, {}, {}, {}};
+		colorArr_t colors = { {{0.5f, 0.5f, 0.5f, 0.5f}, {}, {}, {}} };
 	};
 public:
 	QuadColored(Graphics& gfx, const QuadDesc& desc);

@@ -54,4 +54,5 @@ public:
 	f32 TargetFrameDt() const noexcept { return targetFdt; }
 	void TargetFrameDt(f32 target) noexcept { targetFPS = 1.0f / target; targetFdt = target; }
 
+	f32 clearColor[3] = { 0.0f, 0.0f, 0.0f };
 };

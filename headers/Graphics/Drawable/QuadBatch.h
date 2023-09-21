@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics\Drawable\Drawable.h"
 #include "Graphics\Vertex.h"
+#include <array>
 
 class QuadBatch : public Drawable {
 protected:
@@ -18,11 +19,28 @@ protected:
 
 	Vtx::VertexBuffer vbuf;
 	std::vector<u16, allocator<u16>> indicies;
+private:
+	DirectX::XMFLOAT3 pos{ 0.0f, 0.0f, 0.0f };
+	f32 pitch = 0;
+	f32 yaw = 0;
+	f32 roll = 0;
+	f32 scaleW = 1.0f;
+	f32 scaleH = 1.0f;
 public:
 	QuadBatch(const std::string& name, usize maxQuadCount);
 
 	void Clear();
 	void FlushChanges(Graphics& gfx);
+
+	DirectX::XMFLOAT3 GetPos() const noexcept;
+	void SetPos(f32 x, f32 y, f32 z) noexcept { SetPos({ x, y, z }); }
+	void SetPos(DirectX::XMFLOAT3 pos) noexcept;
+	DirectX::XMFLOAT3 GetRotation() const noexcept;
+	void SetRotation(f32 x, f32 y, f32 z) noexcept;
+	void SetRotation(DirectX::XMFLOAT3 rot) noexcept { SetRotation(rot.x, rot.y, rot.z); }
+	DirectX::XMFLOAT2 GetScale() const noexcept;
+	void SetScale(f32 w, f32 h) noexcept;
+	void SetScale(DirectX::XMFLOAT2 scl) noexcept { SetScale(scl.x, scl.y); }
 
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 };
@@ -70,11 +88,12 @@ public:
 		std::string pixelShader = "Colored_PS.cso";
 	};
 	struct QuadDesc {
+		using colorArr_t = std::array<std::array<f32, 4>, 4>;
 		DirectX::XMFLOAT3 position = { 0, 0, 0 };
 		DirectX::XMFLOAT3 rotation = { 0, 0, 0 };
 		DirectX::XMFLOAT2 size = { 1.0f, 1.0f };
 		bool singleColor = true;
-		u8 colors[4][4] = { {127, 127, 127, 127}, {}, {}, {} };
+		colorArr_t colors = { { {0.5f, 0.5f, 0.5f, 0.5f}, {}, {}, {} } };
 	};
 public:
 	QuadBatchColored(Graphics& gfx, const BatchDesc& desc);

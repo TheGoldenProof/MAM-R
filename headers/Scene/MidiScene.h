@@ -5,39 +5,9 @@
 
 class MidiScene : public Scene {
 protected:
-	struct color_ {
-		u8 r, g, b, a;
-	};
-	static constexpr color_ colors[] = {
-		{255, 0, 0, 255},
-		{255, 127, 0, 255},
-		{255, 191, 0, 255},
-		{255, 255, 0, 255},
-		{191, 255, 0, 255},
-		{127, 255, 0, 255},
-		{63, 255, 0, 255},
-		{0, 255, 0, 255},
-		{0, 255, 63, 255},
-		{0, 255, 127, 255},
-		{0, 255, 191, 255},
-		{0, 255, 255, 255},
-		{0, 191, 255, 255},
-		{0, 127, 255, 255},
-		{0, 63, 255, 255},
-		{0, 0, 255, 255},
-		{63, 0, 255, 255},
-		{127, 0, 255, 255},
-		{191, 0, 255, 255},
-		{255, 0, 255, 255},
-		{255, 0, 191, 255},
-		{255, 0, 127, 255},
-		{255, 0, 63, 255},
-	};
-	static constexpr f32 noteScaleFactor = 1.0f / 1.5f;
-protected:
-	std::unordered_set<std::unique_ptr<Drawable>> visuals;
 	bool needsReset = false;
 
+	f32 lengthScale = 2.0f/3.0f;
 	std::wstring midiPath;
 	MIDI::CookedMidi midi;
 	u32 currentTick = 0;
@@ -45,6 +15,8 @@ protected:
 	u32 tempoMapIndex = 0;
 	bool isPlaying = false;
 	bool reloadMidi = false;
+	i32 midiOffset = 0;
+	i32 midiOffsetPrev = 0;
 
 	std::wstring audioPath;
 	Sound sound;
@@ -54,7 +26,7 @@ protected:
 	i32 audioOffset = 0;
 	i32 audioOffsetPrev = 0;
 
-	class QuadColored* pPlayLine = nullptr;
+	f32 playX = 0.0f;
 public:
 	MidiScene(class Globe& gb, const std::string& name);
 
@@ -64,10 +36,11 @@ public:
 
 	virtual void Reset(Globe& gb);
 protected:
-	virtual void ClearVisuals(Globe& gb);
 	virtual void InitVisuals(Globe& gb) = 0;
+	virtual void ClearVisuals(Globe& gb) = 0;
+	virtual void MovePlay(Globe& gb, f32 dx) = 0;
+	virtual void DrawGUI(class Globe& gb);
 private:
 	void InitMidi(class Globe& gb);
 	void UpdateTPS(class Globe& gb);
-	void DrawGUI(class Globe& gb);
 };

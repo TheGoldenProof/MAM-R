@@ -143,7 +143,7 @@ void App::Draw(f32 dt) {
     }
 
     gb.Gfx().BeginFrame();
-    gb.Gfx().ClearBuffer(0.0f, 0.0f, 0.0f);
+    gb.Gfx().ClearBuffer(gb.clearColor[0], gb.clearColor[1], gb.clearColor[2]);
     gb.Gfx().drawCalls = 0;
 
     gb.Cams().BindActive(gb.Gfx());

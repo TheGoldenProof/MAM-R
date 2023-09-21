@@ -52,7 +52,6 @@ public:
 		std::string reason;
 	};
 public:
-	static constexpr f32 depthScale = MAMR_WINH / 4.0f;
 	u32 drawCalls = 0;
 
 	Graphics(HWND hWnd, u32 width, u32 height);

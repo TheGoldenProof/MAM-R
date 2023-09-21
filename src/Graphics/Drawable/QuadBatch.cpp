@@ -13,8 +13,38 @@ void QuadBatch::FlushChanges(Graphics& gfx) {
 	pIndicies->Update(gfx, indicies.data(), indicies.size());
 }
 
+DirectX::XMFLOAT3 QuadBatch::GetPos() const noexcept {
+	return pos;
+}
+
+void QuadBatch::SetPos(DirectX::XMFLOAT3 pos_) noexcept {
+	pos = pos_;
+}
+
+DirectX::XMFLOAT3 QuadBatch::GetRotation() const noexcept {
+	return { pitch, yaw, roll };
+}
+
+void QuadBatch::SetRotation(f32 pitch_, f32 yaw_, f32 roll_) noexcept {
+	pitch = pitch_;
+	yaw = yaw_;
+	roll = roll_;
+}
+
+DirectX::XMFLOAT2 QuadBatch::GetScale() const noexcept {
+	return { scaleW, scaleH };
+}
+
+void QuadBatch::SetScale(f32 w, f32 h) noexcept {
+	scaleW = w;
+	scaleH = h;
+}
+
 DirectX::XMMATRIX QuadBatch::GetTransformXM() const noexcept {
-	return DirectX::XMMatrixIdentity();
+	DirectX::XMVECTOR pos_ = DirectX::XMVectorSet(pos.x, pos.y, pos.z, 0.0f);
+	DirectX::XMVECTOR rot_ = DirectX::XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+	DirectX::XMVECTOR scl_ = DirectX::XMVectorSet(scaleW, scaleH, 1.0f, 1.0f);
+	return DirectX::XMMatrixAffineTransformation(scl_, DirectX::XMVectorZero(), rot_, pos_);
 }
 
 QuadBatchTextured::QuadBatchTextured(Graphics& gfx, const BatchDesc& desc)
@@ -71,13 +101,13 @@ QuadBatchTextured::QuadBatchTextured(Graphics& gfx, const BatchDesc& desc, std::
 
 void QuadBatchTextured::AddOneQuad(const QuadDesc& quad) {
 	using namespace DirectX;
-	XMVECTOR pos = XMLoadFloat3(&quad.position);
+	XMVECTOR pos_ = XMLoadFloat3(&quad.position);
 	XMVECTOR rot = XMQuaternionRotationRollPitchYaw(quad.rotation.x, quad.rotation.y, quad.rotation.z);
 	XMVECTOR scl = XMLoadFloat2(&quad.size);
 	if (quad.sizeMode == SIZE_MODE_SCALE) {
 		scl = XMVectorMultiply(scl, XMVectorMultiply(XMVectorSet(f32(texWpx), f32(texHpx), 0, 0), XMLoadFloat2(&quad.uvSize)));
 	}
-	XMMATRIX trfm = XMMatrixAffineTransformation(scl, XMVectorZero(), rot, pos);
+	XMMATRIX trfm = XMMatrixAffineTransformation(scl, XMVectorZero(), rot, pos_);
 	XMVECTOR vverts[4] = {  { -0.5f,  0.5f, 0, 0 },
 							{  0.5f,  0.5f, 0, 0 },
 							{ -0.5f, -0.5f, 0, 0 },
@@ -104,7 +134,7 @@ QuadBatchColored::QuadBatchColored(Graphics& gfx, const BatchDesc& desc)
 
 	Vtx::VertexLayout l;
 	l.Append(Vtx::VertexLayout::Position3D);
-	l.Append(Vtx::VertexLayout::Byte4Color);
+	l.Append(Vtx::VertexLayout::Float4Color);
 	vbuf = Vtx::VertexBuffer(l);
 	vbuf.Reserve(maxQuadCount * 4);
 
@@ -142,10 +172,10 @@ QuadBatchColored::QuadBatchColored(Graphics& gfx, const BatchDesc& desc)
 
 void QuadBatchColored::AddOneQuad(const QuadDesc& quad) {
 	using namespace DirectX;
-	XMVECTOR pos = XMLoadFloat3(&quad.position);
+	XMVECTOR pos_ = XMLoadFloat3(&quad.position);
 	XMVECTOR rot = XMQuaternionRotationRollPitchYaw(quad.rotation.x, quad.rotation.y, quad.rotation.z);
 	XMVECTOR scl = XMLoadFloat2(&quad.size);
-	XMMATRIX trfm = XMMatrixAffineTransformation(scl, XMVectorZero(), rot, pos);
+	XMMATRIX trfm = XMMatrixAffineTransformation(scl, XMVectorZero(), rot, pos_);
 	XMVECTOR vverts[4] = { { -0.5f,  0.5f, 0, 0 },
 							{  0.5f,  0.5f, 0, 0 },
 							{ -0.5f, -0.5f, 0, 0 },
@@ -160,7 +190,7 @@ void QuadBatchColored::AddOneQuad(const QuadDesc& quad) {
 
 	for (u32 i = 0; i < 4; i++) {
 		auto color = quad.colors[quad.singleColor ? 0 : i];
-		vbuf.EmplaceBack(fverts[i], Vtx::Byte4Color{ color[0], color[1], color[2], color[3] });
+		vbuf.EmplaceBack(fverts[i], DirectX::XMFLOAT4{ color[0], color[1], color[2], color[3] });
 	}
 
 	indicies.resize(indicies.size() + 6);

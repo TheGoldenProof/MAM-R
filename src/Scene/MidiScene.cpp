@@ -12,18 +12,7 @@
 MidiScene::MidiScene(Globe& gb, const std::string& name) : Scene(gb, name) {}
 
 void MidiScene::Init(Globe& gb) {
-	QuadColored::QuadDesc playLineDesc{
-		.uniqueName = "play line",
-		.size = {3.0f, static_cast<f32>(gb.Gfx().GetHeight())},
-		.layer = 16,
-		.vertexShader = "Colored_VS.cso",
-		.pixelShader = "Colored_PS.cso",
-		.singleColor = true,
-		.colors = {{255, 255, 255, 127}, {}, {}, {}}
-	};
-	auto upPlayLine = std::make_unique<QuadColored>(gb.Gfx(), std::move(playLineDesc));
-	pPlayLine = upPlayLine.get();
-	drawables.emplace(std::move(upPlayLine));
+	UNREFERENCED_PARAMETER(gb);
 }
 
 void MidiScene::Update(Globe& gb) {
@@ -45,29 +34,39 @@ void MidiScene::Update(Globe& gb) {
 		reloadAudio = false;
 	}
 
-	if (volume != volumePrev)
+	if (volume != volumePrev) {
 		sound.SetVolume(volume);
-	volumePrev = volume;
+		volumePrev = volume;
+	}
 
-	if (audioOffset != audioOffsetPrev)
+	if (audioOffset != audioOffsetPrev) {
 		sound.SetOffset(audioOffset);
-	audioOffsetPrev = audioOffset;
-
-	if (!isPlaying) return;
+		audioOffsetPrev = audioOffset;
+	}
 
 	UpdateTPS(gb);
 
-	if (auto opCam = gb.Cams().GetActiveCamera(); opCam) {
-		auto div = midi.GetHeader().division;
-		switch (div.fmt) {
-		case MIDI::MIDI_DIVISION_FORMAT_TPQN:
-			opCam.value().get().Translate({ noteScaleFactor, 0, 0 });
-			break;
-		case MIDI::MIDI_DIVISION_FORMAT_SMPTE:
-			opCam.value().get().Translate({ (6e7f / tempoMicros) * gb.TargetTPS(), 0, 0 }); // no idea if this is right. it might just need to be noteScaleFactor as well.
-			break;
-		}
+	if (midiOffset != midiOffsetPrev) {
+		f32 odx = (midiOffset - midiOffsetPrev) * lengthScale;
+		MovePlay(gb, odx);
+		midiOffsetPrev = midiOffset;
 	}
+
+	if (!isPlaying) return;
+
+	f32 dx = 0;
+
+	auto div = midi.GetHeader().division;
+	switch (div.fmt) {
+	case MIDI::MIDI_DIVISION_FORMAT_TPQN:
+		dx = 1.0f;
+		break;
+	case MIDI::MIDI_DIVISION_FORMAT_SMPTE:
+		dx = (6e7f / tempoMicros) * gb.TargetTPS(); // no idea if this is right. it might just need to be noteScaleFactor as well.
+		break;
+	}
+
+	MovePlay(gb, dx);
 
 	currentTick++;
 }
@@ -75,19 +74,14 @@ void MidiScene::Update(Globe& gb) {
 void MidiScene::Draw(Globe& gb) {
 	Scene::Draw(gb);
 
-	for (auto& drawable : visuals) {
-		drawable->Draw(gb.FrameCtrl());
-	}
-
 	if (gb.Gfx().IsImguiEnabled()) DrawGUI(gb);
-
-	pPlayLine->SetScale(1.0f, static_cast<f32>(gb.Gfx().GetHeight()) / MAMR_WINH);
 
 	if (gb.Kbd().KeyPressed(VK_SPACE)) {
 		isPlaying = !isPlaying;
-		if (sound.IsPlaying()) {
+		bool soundPlaying = sound.IsPlaying();
+		if (!isPlaying && soundPlaying) {
 			sound.Pause();
-		} else {
+		} else if (isPlaying && !soundPlaying) {
 			if (sound.IsPaused()) {
 				sound.Resume();
 			} else {
@@ -101,19 +95,81 @@ void MidiScene::Draw(Globe& gb) {
 		sound.Stop();
 		needsReset = true;
 	}
+	if (gb.Kbd().KeyPressed(VK_F6)) {
+		reloadMidi = true;
+	}
 }
 
 void MidiScene::Reset(Globe& gb) {
 	if (auto opCam = gb.Cams().GetActiveCamera(); opCam) opCam.value().get().Reset();
+	playX = 0.0f;
 	InitMidi(gb);
+	MovePlay(gb, static_cast<f32>(midiOffset));
 	sound.Open(gb.Audio(), audioPath.c_str());
 	sound.SetVolume(volume);
 	sound.SetOffset(audioOffset);
 }
 
-void MidiScene::ClearVisuals(Globe& gb) {
+void MidiScene::DrawGUI(Globe& gb) {
 	UNREFERENCED_PARAMETER(gb);
-	visuals.clear();
+	bool bOpenMIDI = false;
+	bool bOpenAudio = false;
+
+	if (ImGui::BeginMainMenuBar()) {
+		if (ImGui::BeginMenu("File")) {
+			ImGui::MenuItem("Open MIDI", nullptr, &bOpenMIDI);
+			ImGui::MenuItem("Open Audio", nullptr, &bOpenAudio);
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+	}
+
+	if (ImGui::Begin("Audio Controls")) {
+		ImGui::SliderFloat("Volume", &volume, 0.0, 2.0);
+		ImGui::InputInt("Offset (ms)", &audioOffset);
+	}
+	ImGui::End();
+
+	if (ImGui::Begin("MIDI Controls")) {
+		ImGui::InputInt("Offset (frames)", &midiOffset);
+	}
+	ImGui::End();
+
+	if (ImGui::Begin("Misc Controls")) {
+		ImGui::ColorEdit3("Background", gb.clearColor);
+	}
+	ImGui::End();
+
+	if (ImGui::Begin("Controls")) {
+		ImGui::Text("Space: Play/Pause");
+		ImGui::Text("F1: Toggle GUI");
+		ImGui::Text("F3: Toggle debug info");
+		ImGui::Text("F5: Reset");
+		ImGui::Text("F6: Refresh MIDI");
+		ImGui::Text("F11: Toggle Fullscreen");
+	}
+	ImGui::End();
+
+	if (bOpenMIDI) {
+		std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { {L"MIDI file", L"*.mid;*.midi"}, {L"All files", L"*.*"} };
+		midiPath = gb.Wnd().OpenFile(std::move(fileTypes), 1, L".mid");
+		if (auto oCam = gb.Cams().GetActiveCamera(); oCam) oCam.value().get().Reset();
+		isPlaying = false;
+		reloadMidi = true;
+	}
+
+	if (bOpenAudio) {
+		std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { 
+			// idk what all sound files can even be opened so im just gonna leave it as this.
+			{L"All files", L"*.*"} 
+		};
+		audioPath = gb.Wnd().OpenFile(fileTypes, 1, L".mp3");
+		sound.Open(gb.Audio(), audioPath.c_str());
+		if (auto oCam = gb.Cams().GetActiveCamera(); oCam) oCam.value().get().Reset();
+		isPlaying = false;
+		reloadAudio = true;
+	}
 }
 
 void MidiScene::InitMidi(Globe& gb) {
@@ -141,6 +197,7 @@ void MidiScene::UpdateTPS(Globe& gb) {
 	if (tempoMapIndex >= tempoMap.size()) return;
 
 	if (const auto p = midi.GetTempoMap()[tempoMapIndex]; currentTick == p.first) {
+		if (tempoMicros == p.second) return;
 		tempoMicros = p.second;
 
 		auto div = midi.GetHeader().division;
@@ -156,46 +213,4 @@ void MidiScene::UpdateTPS(Globe& gb) {
 		tempoMapIndex++;
 	}
 
-}
-
-void MidiScene::DrawGUI(Globe& gb) {
-	UNREFERENCED_PARAMETER(gb);
-	bool bOpenMIDI = false;
-	bool bOpenAudio = false;
-
-	if (ImGui::BeginMainMenuBar()) {
-		if (ImGui::BeginMenu("File")) {
-			ImGui::MenuItem("Open MIDI", nullptr, &bOpenMIDI);
-			ImGui::MenuItem("Open Audio", nullptr, &bOpenAudio);
-			ImGui::EndMenu();
-		}
-
-		ImGui::EndMainMenuBar();
-	}
-
-	if (ImGui::Begin("Audio Controls")) {
-		ImGui::SliderFloat("Volume", &volume, 0.0, 2.0);
-		ImGui::InputInt("Offset (ms)", &audioOffset);
-		ImGui::End();
-	}
-
-	if (bOpenMIDI) {
-		std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { {L"MIDI file", L"*.mid;*.midi"}, {L"All files", L"*.*"} };
-		midiPath = gb.Wnd().OpenFile(std::move(fileTypes), 1, L".mid");
-		if (auto oCam = gb.Cams().GetActiveCamera(); oCam) oCam.value().get().Reset();
-		isPlaying = false;
-		reloadMidi = true;
-	}
-
-	if (bOpenAudio) {
-		std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { 
-			// idk what all sound files can even be opened so im just gonna leave it as this.
-			{L"All files", L"*.*"} 
-		};
-		audioPath = gb.Wnd().OpenFile(fileTypes, 1, L".mp3");
-		sound.Open(gb.Audio(), audioPath.c_str());
-		if (auto oCam = gb.Cams().GetActiveCamera(); oCam) oCam.value().get().Reset();
-		isPlaying = false;
-		reloadAudio = true;
-	}
 }

@@ -507,5 +507,7 @@
   <ItemGroup>
     <FxCompile Include="shaders\Colored_VS.hlsl" />
     <FxCompile Include="shaders\Colored_PS.hlsl" />
+    <FxCompile Include="shaders\DarkenPlayed_VS.hlsl" />
+    <FxCompile Include="shaders\DarkenPlayed_PS.hlsl" />
   </ItemGroup>
 </Project>

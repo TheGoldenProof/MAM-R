@@ -20,6 +20,7 @@ public:
 	virtual ~Drawable() = default;
 
 	void AddTechnique(Technique tech) noexcept;
+	std::vector<Technique>& GetTechniques() noexcept;
 
 	virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
 

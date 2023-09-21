@@ -14,6 +14,10 @@ void Technique::AddStep(const QueueStep& step) noexcept {
 	steps.push_back(step);
 }
 
+std::vector<QueueStep>& Technique::GetSteps() noexcept {
+	return steps;
+}
+
 bool Technique::IsActive() const noexcept { return active; }
 void Technique::SetActive(bool active_) noexcept { active = active_; }
 const std::string& Technique::GetName() const noexcept { return name; }

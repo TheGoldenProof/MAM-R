@@ -8,6 +8,10 @@ void Drawable::AddTechnique(Technique tech) noexcept {
 	techniques.push_back(std::move(tech));
 }
 
+std::vector<Technique>& Drawable::GetTechniques() noexcept {
+	return techniques;
+}
+
 void Drawable::Draw(FrameController& frame) const noexcept {
 	for (const auto& tech : techniques) tech.Draw(frame, *this);
 }

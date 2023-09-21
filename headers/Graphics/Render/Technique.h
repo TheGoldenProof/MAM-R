@@ -10,6 +10,7 @@ public:
 
 	void Draw(class FrameController& fc, const class Drawable& drawable) const noexcept;
 	void AddStep(const QueueStep& step) noexcept;
+	std::vector<QueueStep>& GetSteps() noexcept;
 	bool IsActive() const noexcept;
 	void SetActive(bool active) noexcept;
 	const std::string& GetName() const noexcept;

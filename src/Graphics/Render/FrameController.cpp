@@ -48,7 +48,11 @@ void FrameController::Execute(Globe& gb) dbgexcept {
 	
 	gfx.BindSwapBuffer();
 	//gfx.SetProjection(projF);
-	for (u32 i = 0; i < 16; i++) passes[i].Execute(gfx);
+	for (u32 i = 0; i < 15; i++) passes[i].Execute(gfx);
+
+	Rasterizer::Resolve(gfx, false)->Bind(gfx);
+	passes[15].Execute(gfx);
+	Rasterizer::Resolve(gfx, true)->Bind(gfx);
 
 	gb.Cams().SetActive("HUD cam");
 	gb.Cams().BindActive(gb.Gfx());

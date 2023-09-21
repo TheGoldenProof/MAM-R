@@ -7,7 +7,7 @@
 class Camera {
 	friend class CameraScript;
 public:
-	Camera(const std::string& name, DirectX::XMFLOAT3 homePos = { 0, 0, -Graphics::depthScale*2 }) noexcept;
+	Camera(const std::string& name, DirectX::XMFLOAT3 homePos = { 0, 0, -480 }) noexcept;
 	Camera(const std::string& name, DirectX::XMFLOAT3 homePos, f32 homePitch, f32 homeYaw) noexcept;
 	void Bind(Graphics& gfx);
 	DirectX::XMMATRIX GetMatrix() const noexcept;
