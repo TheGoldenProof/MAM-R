@@ -40,14 +40,14 @@ public:
 
 	class Exception : public MyException {
 	public:
-		Exception(i32 line, const char* file, const std::string& note, std::optional<HRESULT> hr ={}) noexcept;
-		Exception(i32 line, const char* file, const std::string& filename, const std::string& note, std::optional<HRESULT> hr ={}) noexcept;
+		Exception(i32 line, const wchar_t* file, const std::wstring& note, std::optional<HRESULT> hr ={}) noexcept;
+		Exception(i32 line, const wchar_t* file, const std::wstring& filename, const std::wstring& note, std::optional<HRESULT> hr ={}) noexcept;
 		const char* what() const noexcept override;
 		const char* GetType() const noexcept override;
-		const std::string& GetNote() const noexcept;
+		const std::wstring& GetNote() const noexcept;
 	private:
 		std::optional<HRESULT> hr;
-		std::string note;
+		std::wstring note;
 	};
 public:
 	Surface(u32 width, u32 height);
@@ -66,9 +66,9 @@ public:
 	const Color* GetBufferPtr() const noexcept;
 	const Color* GetBufferPtrConst() const noexcept;
 	
-	static Surface FromFile(std::string const& name);
+	static Surface FromFile(std::wstring const& name);
 	static Surface ErrorTexture();
-	void Save(std::string const& filename) const;
+	void Save(std::wstring const& filename) const;
 	bool HasAlpha() const noexcept;
 	bool IsErrorTex() const noexcept;
 private:

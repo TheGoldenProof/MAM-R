@@ -40,7 +40,7 @@ RawMidi::RawMidi(Globe& gb, const std::wstring& path) {
 		}
 	}
 	if (file.fail()) {
-		DEBUG_LOG("Something went wrong reading the file.\n");
+		DEBUG_LOG("Something might have gone wrong reading the file.\n");
 	}
 }
 

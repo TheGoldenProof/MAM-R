@@ -2,8 +2,6 @@
 
 ## Todo list
 
- - Save visual customizations 
- - Image as background? or overlay? 
- - Both offsets use milliseconds 
- - Note length scale 
- - Note height 
+- Save visual customizations
+- Why does reloading change depth spacing again?
+- Separate note height and depth

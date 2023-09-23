@@ -2,7 +2,7 @@
 #include "Graphics/GraphicsMacros.h"
 #include "Graphics/Bindable/BindableCodex.h"
 
-IndexBuffer::IndexBuffer(Graphics& gfx, const std::string& tag, const u16* pData, usize count, bool updatable_, u32 maxCount_)
+IndexBuffer::IndexBuffer(Graphics& gfx, const std::string& tag, const u32* pData, usize count, bool updatable_, u32 maxCount_)
 	: tag(tag), indexCount(u32(count)), updatable(updatable_), maxCount(u32(max(maxCount_, count))) {
 	INFOMAN(gfx);
 
@@ -11,21 +11,21 @@ IndexBuffer::IndexBuffer(Graphics& gfx, const std::string& tag, const u16* pData
 	bd.Usage = updatable? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
 	bd.CPUAccessFlags = updatable? D3D11_CPU_ACCESS_WRITE : 0;
 	bd.MiscFlags = 0;
-	bd.ByteWidth = maxCount * sizeof(u16);
-	bd.StructureByteStride = sizeof(u16);
+	bd.ByteWidth = maxCount * sizeof(u32);
+	bd.StructureByteStride = sizeof(u32);
 	D3D11_SUBRESOURCE_DATA srd{};
 	srd.pSysMem = pData;
 	GFX_THROW_INFO(GetDevice(gfx)->CreateBuffer(&bd, &srd, &pIndexBuffer));
 }
 
-void IndexBuffer::Update(Graphics& gfx, const u16* data, usize count_) {
+void IndexBuffer::Update(Graphics& gfx, const u32* data, usize count_) {
 	if (!updatable) return;
 	INFOMAN(gfx);
 
 	D3D11_MAPPED_SUBRESOURCE msr{};
 	GFX_THROW_INFO(GetContext(gfx)->Map(pIndexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
-	const usize dataSize = maxCount * sizeof(u16);
-	const usize vbufSize = count_ * sizeof(u16);
+	const usize dataSize = maxCount * sizeof(u32);
+	const usize vbufSize = count_ * sizeof(u32);
 	memcpy_s(msr.pData, dataSize, data, min(dataSize, vbufSize));
 	GetContext(gfx)->Unmap(pIndexBuffer.Get(), 0);
 
@@ -33,12 +33,12 @@ void IndexBuffer::Update(Graphics& gfx, const u16* data, usize count_) {
 }
 
 void IndexBuffer::Bind(Graphics& gfx) noexcept {
-	GetContext(gfx)->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+	GetContext(gfx)->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 }
 
 u32 IndexBuffer::GetCount() const noexcept { return indexCount; }
 
-std::shared_ptr<IndexBuffer> IndexBuffer::Resolve(Graphics& gfx, const std::string& tag, const u16* pData, usize count, bool updatable_, u32 maxCount_) {
+std::shared_ptr<IndexBuffer> IndexBuffer::Resolve(Graphics& gfx, const std::string& tag, const u32* pData, usize count, bool updatable_, u32 maxCount_) {
 	assert(tag != "?");
 	return BindableCodex::Resolve<IndexBuffer>(gfx, tag, pData, count, updatable_, maxCount_);
 }

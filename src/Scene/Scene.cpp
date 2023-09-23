@@ -1,6 +1,7 @@
 #include "Globe.h"
 #include "Graphics\Drawable\Drawables.h"
 #include "Scene\Scene.h"
+#include "TGLib\TGLib_Util.h"
 #include <fstream>
 
 Scene::Scene(Globe& gb, const std::string& name) : name(name) {
@@ -90,7 +91,7 @@ bool Scene::ReadQuad(Graphics& gfx, std::ifstream& file) {
 		QuadTextured::QuadDesc{
 			name +"_q" + std::to_string(drawables.size()), 
 			{sizeX, sizeY}, layer, vs, ps, 
-			tex, (SIZE_MODE)sizeMode, {offsetU, offsetV}, {sizeU, sizeV}, (D3D11_FILTER)filter 
+			TGLib::ToWide(tex), (SIZE_MODE)sizeMode, {offsetU, offsetV}, {sizeU, sizeV}, (D3D11_FILTER)filter
 		});
 	quad->SetPos({ posX, posY, 0.0f });
 

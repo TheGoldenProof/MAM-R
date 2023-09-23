@@ -71,8 +71,10 @@ public:
 	DirectX::XMMATRIX GetProjection() const noexcept;
 	void SetCamera(DirectX::FXMMATRIX cam) noexcept;
 	DirectX::XMMATRIX GetCamera() const noexcept;
-	void SetDepthTest(bool enable);
-	bool GetDepthTest() const noexcept;
+	void SetDepthTest(bool enable, D3D11_COMPARISON_FUNC funcfunc = D3D11_COMPARISON_LESS, D3D11_DEPTH_WRITE_MASK mask = D3D11_DEPTH_WRITE_MASK_ALL);
+	bool GetDepthTestEnabled() const noexcept;
+	D3D11_COMPARISON_FUNC GetDepthTestFunc() const noexcept;
+	D3D11_DEPTH_WRITE_MASK GetDepthTestMask() const noexcept;
 
 	void OnResize(u32 newWidth, u32 newHeight);
 	u32 GetWidth() const noexcept;
@@ -92,6 +94,8 @@ private:
 
 	std::unique_ptr<class DepthStencil> pDepthStencil;
 	bool depthTestEnabled = true;
+	D3D11_COMPARISON_FUNC depthTestFunc = D3D11_COMPARISON_LESS;
+	D3D11_DEPTH_WRITE_MASK depthTestMask = D3D11_DEPTH_WRITE_MASK_ALL;
 
 	#ifndef NDEBUG
 	mutable DxgiInfoManager infoManager;

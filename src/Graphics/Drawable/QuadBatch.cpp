@@ -66,7 +66,7 @@ QuadBatchTextured::QuadBatchTextured(Graphics& gfx, const BatchDesc& desc, std::
 	vbuf.Reserve(maxQuadCount * 4);
 
 	indicies.resize(maxQuadCount * 6);
-	for (u16 i = 0; i < maxQuadCount; i++) {
+	for (u32 i = 0; i < maxQuadCount; i++) {
 		indicies[i * 6 + 0] = 0 + i * 4;
 		indicies[i * 6 + 1] = 1 + i * 4;
 		indicies[i * 6 + 2] = 2 + i * 4;
@@ -139,7 +139,7 @@ QuadBatchColored::QuadBatchColored(Graphics& gfx, const BatchDesc& desc)
 	vbuf.Reserve(maxQuadCount * 4);
 
 	indicies.resize(maxQuadCount * 6);
-	for (u16 i = 0; i < maxQuadCount; i++) {
+	for (u32 i = 0; i < maxQuadCount; i++) {
 		indicies[i * 6 + 0] = 0 + i * 4;
 		indicies[i * 6 + 1] = 1 + i * 4;
 		indicies[i * 6 + 2] = 2 + i * 4;

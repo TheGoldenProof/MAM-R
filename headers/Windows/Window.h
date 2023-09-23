@@ -14,7 +14,7 @@ public:
 	class Exception : public MyException {
 		using MyException::MyException;
 	public:
-		static std::string TranslateErrorCode(HRESULT hr) noexcept;
+		static std::wstring TranslateErrorCode(HRESULT hr) noexcept;
 	};
 	class HrException : public Exception {
 	public:

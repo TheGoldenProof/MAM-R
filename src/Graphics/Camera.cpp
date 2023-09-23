@@ -7,10 +7,8 @@
 namespace dx = DirectX;
 
 #pragma region Camera
-Camera::Camera(const std::string& name, dx::XMFLOAT3 homePos) noexcept : Camera(name, homePos, 0, 0) {}
-
-Camera::Camera(const std::string& name, DirectX::XMFLOAT3 homePos, f32 homePitch, f32 homeYaw) noexcept
-	: name(name), homePos(homePos), homePitch(homePitch), homeYaw(homeYaw) {
+Camera::Camera(const std::string& name, DirectX::XMFLOAT3 homePos, DirectX::XMFLOAT3 homeRot) noexcept
+	: name(name), homePos(homePos), homeRot(homeRot) {
 	Reset();
 }
 
@@ -22,28 +20,29 @@ DirectX::XMMATRIX Camera::GetMatrix() const noexcept {
 	using namespace dx;
 
 	const XMVECTOR forwardBase = XMVectorSet(0, 0, 1, 0);
-	const XMVECTOR lookVec = XMVector3Transform(forwardBase, XMMatrixRotationRollPitchYaw(pitch, yaw, 0));
+	const XMMATRIX rotMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
+	const XMVECTOR lookVec = XMVector3Transform(forwardBase, rotMatrix);
+	const XMVECTOR upVec = XMVector3Transform(XMVectorSet(0, 1, 0, 0), rotMatrix);
 	const XMVECTOR posVec = XMLoadFloat3(&pos);
 	const XMVECTOR target = posVec + lookVec;
 
-	return XMMatrixLookAtLH(posVec, target, XMVectorSet(0, 1, 0, 0));
+	return XMMatrixLookAtLH(posVec, target, upVec);
 }
 
 void Camera::Reset() noexcept {
 	pos = homePos;
-	pitch = 0;
-	yaw = 0;
+	rot = homeRot;
 }
 
 void Camera::Rotate(f32 dx, f32 dy) noexcept {
-	yaw = Math::wrapAngle_rad(yaw + dx);
-	pitch = std::clamp(pitch + dy, 0.995f * -(f32)Math::HALF_PI, 0.995f * (f32)Math::HALF_PI);
+	rot.y = Math::wrapAngle_rad(rot.y + dx);
+	rot.x = std::clamp(rot.x + dy, 0.995f * -(f32)Math::HALF_PI, 0.995f * (f32)Math::HALF_PI);
 }
 
 void Camera::Translate(DirectX::XMFLOAT3 translation) noexcept {
 	using namespace dx;
 
-	XMStoreFloat3(&translation, XMVector3Transform(XMLoadFloat3(&translation), XMMatrixRotationRollPitchYaw(pitch, yaw, 0)));
+	XMStoreFloat3(&translation, XMVector3Transform(XMLoadFloat3(&translation), XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z)));
 	pos ={pos.x + translation.x, pos.y + translation.y, pos.z + translation.z};
 }
 
@@ -53,16 +52,52 @@ void Camera::SetPos(DirectX::XMFLOAT3 pos_) noexcept {
 	pos = pos_;
 }
 
+void Camera::SetHomePos(DirectX::XMFLOAT3 pos_) noexcept {
+	homePos = pos_;
+}
+
+DirectX::XMFLOAT3 Camera::GetHomePos() const noexcept {
+	return homePos;
+}
+
+void Camera::SetHomeRotation(DirectX::XMFLOAT3 rotation) noexcept {
+	homeRot = rotation;
+}
+
+DirectX::XMFLOAT3 Camera::GetHomeRotation() const noexcept {
+	return homeRot;
+}
+
 void Camera::SpawnControlWindow() noexcept {
-	constexpr f32 hp = (f32)Math::HALF_PI;
 	if (ImGui::Begin(name.c_str())) {
 		ImGui::Text("Position");
-		ImGui::SliderFloat("X", &pos.x, -8.0f, 8.0f);
-		ImGui::SliderFloat("Y", &pos.y, -8.0f, 8.0f);
-		ImGui::SliderFloat("Z", &pos.z, -8.0f, 8.0f);
+		ImGui::InputFloat("X", &pos.x, 20.0f, 200.0f);
+		ImGui::InputFloat("Y", &pos.y, 20.0f, 200.0f);
+		ImGui::InputFloat("Z", &pos.z, 20.0f, 200.0f);
+		if (ImGui::Button("Set as default##pos")) {
+			homePos = pos;
+		}
+		DirectX::XMFLOAT3 rotDeg = {Math::to_deg(rot.x), Math::to_deg(rot.y), Math::to_deg(rot.z)};
+		const char* fmt = "%.1f";
 		ImGui::Text("Orientation");
-		ImGui::SliderFloat("Pitch", &pitch, -hp, hp);
-		ImGui::SliderFloat("Yaw", &yaw, -hp, hp);
+		ImGui::SetNextItemWidth(48.0f);
+		if (ImGui::InputFloat("##Pitchinp", &rotDeg.x, 0, 0, fmt))
+			rot.x = Math::to_rad(Math::wrapAngle_deg(rotDeg.x));
+		ImGui::SameLine();
+		ImGui::SliderAngle("Pitch", &rot.x, -179.0f, 179.0f);
+		ImGui::SetNextItemWidth(48.0f);
+		if (ImGui::InputFloat("##Yawinp", &rotDeg.y, 0, 0, fmt))
+			rot.y = Math::to_rad(std::clamp(Math::wrapAngle_deg(rotDeg.y), -179.0f, 179.0f));
+		ImGui::SameLine();
+		ImGui::SliderAngle("Yaw", &rot.y, -180.0f, 180.0f);
+		ImGui::SetNextItemWidth(48.0f);
+		if (ImGui::InputFloat("##Rollinp", &rotDeg.z, 0, 0, fmt))
+			rot.z = Math::to_rad(Math::wrapAngle_deg(rotDeg.z));
+		ImGui::SameLine();
+		ImGui::SliderAngle("Roll", &rot.z, -180.0f, 180.0f);
+		if (ImGui::Button("Set as default##rot")) {
+			homeRot = rot;
+		}
 	}
 	ImGui::End();
 }

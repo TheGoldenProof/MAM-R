@@ -6,32 +6,32 @@
 #include <filesystem>
 #include <sstream>
 
-Surface::Exception::Exception(i32 line, const char* file, const std::string& note_, std::optional<HRESULT> hr) noexcept
-	: MyException(line, file), note("[Note] "+note_) {
-	if (hr) note = "[Error String] " + Window::Exception::TranslateErrorCode(*hr) + "\n" + note;
+Surface::Exception::Exception(i32 line, const wchar_t* file, const std::wstring& note_, std::optional<HRESULT> hr) noexcept
+	: MyException(line, TGLib::ToNarrow(file).c_str()), note(L"[Note] "+note_) {
+	if (hr) note = L"[Error String] " + Window::Exception::TranslateErrorCode(*hr) + L"\n" + note;
 }
 
-Surface::Exception::Exception(i32 line, const char* file, const std::string& filename, const std::string& note_, std::optional<HRESULT> hr) noexcept
-	: MyException(line, file) {
+Surface::Exception::Exception(i32 line, const wchar_t* file, const std::wstring& filename, const std::wstring& note_, std::optional<HRESULT> hr) noexcept
+	: MyException(line, TGLib::ToNarrow(file).c_str()) {
 	using namespace std::string_literals;
-	note = "[File] "s + filename + "\n" + "[Note] " + note_;
-	if (hr) note = "[Error String] " + Window::Exception::TranslateErrorCode(*hr) + "\n" + note;
+	note = L"[File] "s + filename + L"\n" + L"[Note] " + note_;
+	if (hr) note = L"[Error String] " + Window::Exception::TranslateErrorCode(*hr) + L"\n" + note;
 }
 
 const char* Surface::Exception::what() const noexcept {
 	std::ostringstream oss;
-	oss << MyException::what() << std::endl << GetNote();
+	oss << MyException::what() << std::endl << TGLib::ToNarrow(GetNote());
 	whatBuffer = oss.str();
 	return whatBuffer.c_str();
 }
 
 const char* Surface::Exception::GetType() const noexcept { return "Surface Exception"; }
 
-const std::string& Surface::Exception::GetNote() const noexcept { return note; }
+const std::wstring& Surface::Exception::GetNote() const noexcept { return note; }
 
 Surface::Surface(u32 width, u32 height) : isError(false) {
 	HRESULT hr = scratch.Initialize2D(format, width, height, 1, 1);
-	if (FAILED(hr)) throw Exception(__LINE__, __FILE__, "Failed to initialize ScratchImage", hr);
+	if (FAILED(hr)) throw Exception(__LINE__, __FILEW__, L"Failed to initialize ScratchImage", hr);
 }
 
 Surface::Surface(DirectX::ScratchImage scratch, bool isError) noexcept
@@ -72,11 +72,11 @@ Surface::Color* Surface::GetBufferPtr() noexcept { return (Color*)(scratch.GetPi
 const Surface::Color* Surface::GetBufferPtr() const noexcept { return const_cast<Surface*>(this)->GetBufferPtr(); }
 const Surface::Color* Surface::GetBufferPtrConst() const noexcept { return const_cast<Surface*>(this)->GetBufferPtr(); }
 
-Surface Surface::FromFile(const std::string& name) {
+Surface Surface::FromFile(const std::wstring& name) {
 	DirectX::ScratchImage scratch;
-	HRESULT hr = DirectX::LoadFromWICFile(TGLib::ToWide(name).c_str(), DirectX::WIC_FLAGS_NONE, nullptr, scratch);
+	HRESULT hr = DirectX::LoadFromWICFile(name.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, scratch);
 	if (FAILED(hr)) {
-		Surface::Exception e(__LINE__, __FILE__, name, "Failed to load image", hr);
+		Surface::Exception e(__LINE__, __FILEW__, name, L"Failed to load image", hr);
 		DEBUG_LOG("\n\n");
 		DEBUG_LOG(e.what());
 		DEBUG_LOG("\n\n");
@@ -87,7 +87,7 @@ Surface Surface::FromFile(const std::string& name) {
 	if (scratch.GetImage(0, 0, 0)->format != format) {
 		DirectX::ScratchImage converted;
 		hr = DirectX::Convert(*scratch.GetImage(0, 0, 0), format, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, converted);
-		if (FAILED(hr)) throw Exception(__LINE__, __FILE__, name, "Failed to convert image", hr);
+		if (FAILED(hr)) throw Exception(__LINE__, __FILEW__, name, L"Failed to convert image", hr);
 		return Surface(std::move(converted));
 	}
 
@@ -100,7 +100,7 @@ Surface Surface::ErrorTexture() {
 
 	DirectX::ScratchImage errorTex;
 	HRESULT hr = errorTex.Initialize2D(format, 2, 2, 1, 1);
-	if (FAILED(hr)) throw Exception(__LINE__, __FILE__, "Failed to initialize ScratchImage", hr);
+	if (FAILED(hr)) throw Exception(__LINE__, __FILEW__, L"Failed to initialize ScratchImage", hr);
 
 	auto& data = *errorTex.GetImage(0, 0, 0);
 	((u32*)(data.pixels + data.rowPitch * 0))[0] = magenta;
@@ -111,25 +111,25 @@ Surface Surface::ErrorTexture() {
 	return Surface(std::move(errorTex), true);
 }
 
-void Surface::Save(std::string const& filename) const {
-	const auto GetCodecID = [](const std::string& filename) {
+void Surface::Save(std::wstring const& filename) const {
+	const auto GetCodecID = [](const std::wstring& filename) {
 		const std::filesystem::path path = filename;
-		const auto ext = path.extension().string();
+		const auto ext = path.extension().wstring();
 		#define CASE(str, codec) if (ext == str) { return codec; }
-		CASE(".png", DirectX::WIC_CODEC_PNG) else
-		CASE(".gif", DirectX::WIC_CODEC_GIF) else
-		CASE(".bmp", DirectX::WIC_CODEC_BMP) else
-		CASE(".ico", DirectX::WIC_CODEC_ICO) else
-		CASE(".jpg" || ext == ".jpeg", DirectX::WIC_CODEC_JPEG) else
-		CASE(".tif" || ext == ".tiff", DirectX::WIC_CODEC_TIFF) else
-		CASE(".heif" || ext == ".heic", DirectX::WIC_CODEC_HEIF) else
-		CASE(".hdp" || ext == ".wdp" || ext == ".jxr", DirectX::WIC_CODEC_WMP)
+		CASE(L".png", DirectX::WIC_CODEC_PNG) else
+		CASE(L".gif", DirectX::WIC_CODEC_GIF) else
+		CASE(L".bmp", DirectX::WIC_CODEC_BMP) else
+		CASE(L".ico", DirectX::WIC_CODEC_ICO) else
+		CASE(L".jpg" || ext == L".jpeg", DirectX::WIC_CODEC_JPEG) else
+		CASE(L".tif" || ext == L".tiff", DirectX::WIC_CODEC_TIFF) else
+		CASE(L".heif" || ext == L".heic", DirectX::WIC_CODEC_HEIF) else
+		CASE(L".hdp" || ext == L".wdp" || ext == L".jxr", DirectX::WIC_CODEC_WMP)
 		#undef CASE
-		else throw Exception(__LINE__, __FILE__, filename, "Image format not supported");
+		else throw Exception(__LINE__, __FILEW__, filename, L"Image format not supported");
 	};
 
-	HRESULT hr = DirectX::SaveToWICFile(*scratch.GetImage(0, 0, 0), DirectX::WIC_FLAGS_NONE, DirectX::GetWICCodec(GetCodecID(filename)), TGLib::ToWide(filename).c_str());
-	if (FAILED(hr)) throw Exception(__LINE__, __FILE__, filename, "Failed to save image", hr);
+	HRESULT hr = DirectX::SaveToWICFile(*scratch.GetImage(0, 0, 0), DirectX::WIC_FLAGS_NONE, DirectX::GetWICCodec(GetCodecID(filename)), filename.c_str());
+	if (FAILED(hr)) throw Exception(__LINE__, __FILEW__, filename, L"Failed to save image", hr);
 }
 
 bool Surface::HasAlpha() const noexcept {

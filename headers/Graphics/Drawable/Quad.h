@@ -16,6 +16,7 @@ public:
 
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 	void SpawnControlWindow(Graphics& gfx, const std::string& name) noexcept;
+	void SpawnControlWindowInner() noexcept;
 protected:
 	Quad(const std::string& name);
 protected:
@@ -37,7 +38,7 @@ public:
 		usize layer = 0;
 		std::string vertexShader = "VS_Texture.cso";
 		std::string pixelShader = "PS_Texture.cso";
-		std::string texture;
+		std::wstring texture;
 		SIZE_MODE sizeMode = SIZE_MODE_SCALE;
 		DirectX::XMFLOAT2 uvOffset = { 0, 0 };
 		DirectX::XMFLOAT2 uvSize = { 1.0f, 1.0f };

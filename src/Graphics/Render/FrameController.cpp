@@ -20,7 +20,7 @@ FrameController::FrameController(Graphics& gfx) {
 	vbuf.EmplaceBack(dx::XMFLOAT2{-1,-1});
 	vbuf.EmplaceBack(dx::XMFLOAT2{ 1,-1});
 	pVbFull = VertexBuffer::Resolve(gfx, "$Full", std::move(vbuf));
-	std::vector<u16> indicies{0,1,2,1,3,2};
+	std::vector<u32> indicies{0,1,2,1,3,2};
 	pIbFull = IndexBuffer::Resolve(gfx, "$Full", std::move(indicies));
 
 	pVsFull = VertexShader::Resolve(gfx, "VS_Fullscreen.cso");
@@ -39,26 +39,28 @@ void FrameController::Execute(Globe& gb) dbgexcept {
 	//ds.Clear(gfx);
 
 	const auto currentCamName = gb.Cams().GetActiveCamera().transform([](const auto& camRef) { return camRef.get().GetName(); });
-	const bool depthTestEnabled = gfx.GetDepthTest();
+	const bool depthTestEnabled = gfx.GetDepthTestEnabled();
 
 	constexpr f32 nearZ = 1.0f / 64;
 	const f32 aspect = static_cast<f32>(gb.Gfx().GetWidth()) / static_cast<f32>(gb.Gfx().GetHeight());
-	auto proj = DirectX::XMMatrixPerspectiveFovLH(Math::to_rad(90.0f), aspect, nearZ, 65536.0f);
+	auto proj = DirectX::XMMatrixPerspectiveFovLH(Math::to_rad(60.0f), aspect, nearZ, 8192.0f);
 	gb.Gfx().SetProjection(std::move(proj));
 	
 	gfx.BindSwapBuffer();
 	//gfx.SetProjection(projF);
-	for (u32 i = 0; i < 15; i++) passes[i].Execute(gfx);
-
-	Rasterizer::Resolve(gfx, false)->Bind(gfx);
-	passes[15].Execute(gfx);
-	Rasterizer::Resolve(gfx, true)->Bind(gfx);
+	for (u32 i = 0; i < 16; i++) passes[i].Execute(gfx);
 
 	gb.Cams().SetActive("HUD cam");
 	gb.Cams().BindActive(gb.Gfx());
 	gfx.SetProjection(DXUtil::CustomOrthoProj(static_cast<f32>(gfx.GetWidth()), static_cast<f32>(gfx.GetHeight())));
+	//gfx.SetProjection(DXUtil::CustomOrthoProj(MAMR_WINW, MAMR_WINH));
+
+	gfx.SetDepthTest(true, D3D11_COMPARISON_EQUAL, D3D11_DEPTH_WRITE_MASK_ZERO);
+	passes[16].Execute(gfx);
+
+	//gfx.SetProjection(DXUtil::CustomOrthoProj(static_cast<f32>(gfx.GetWidth()), static_cast<f32>(gfx.GetHeight())));
 	gfx.SetDepthTest(false);
-	for (u32 i = 16; i < 32; i++) passes[i].Execute(gfx);
+	for (u32 i = 17; i < 32; i++) passes[i].Execute(gfx);
 
 	if (currentCamName) gb.Cams().SetActive(currentCamName.value());
 	if (depthTestEnabled) gfx.SetDepthTest(true);

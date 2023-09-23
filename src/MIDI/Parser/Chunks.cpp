@@ -56,9 +56,9 @@ void MIDI::HeaderChunk::DebugPrint(std::ostream& out) const {
 		out << std::format("fps:{:d}  ticks/frame:{:d}\n", -division.smpte, division.ticksPerFrame);
 	}
 }
+#endif
 
 MIDI::TrackChunk::TrackChunk() : Chunk("MTrk", 0) {}
-#endif
 
 MIDI::TrackChunk::TrackChunk(std::ifstream& file) : TrackChunk() {
 	if (!checkStream(file)) return;

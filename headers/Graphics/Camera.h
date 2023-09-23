@@ -7,8 +7,7 @@
 class Camera {
 	friend class CameraScript;
 public:
-	Camera(const std::string& name, DirectX::XMFLOAT3 homePos = { 0, 0, -480 }) noexcept;
-	Camera(const std::string& name, DirectX::XMFLOAT3 homePos, f32 homePitch, f32 homeYaw) noexcept;
+	Camera(const std::string& name, DirectX::XMFLOAT3 homePos = {}, DirectX::XMFLOAT3 homeRot = {}) noexcept;
 	void Bind(Graphics& gfx);
 	DirectX::XMMATRIX GetMatrix() const noexcept;
 	void Reset() noexcept;
@@ -16,14 +15,18 @@ public:
 	void Translate(DirectX::XMFLOAT3 translation) noexcept;
 	DirectX::XMFLOAT3 GetPos() const noexcept;
 	void SetPos(DirectX::XMFLOAT3 pos) noexcept;
+	void SetHomePos(DirectX::XMFLOAT3 pos) noexcept;
+	DirectX::XMFLOAT3 GetHomePos() const noexcept;
+	void SetHomeRotation(DirectX::XMFLOAT3 rotation) noexcept;
+	DirectX::XMFLOAT3 GetHomeRotation() const noexcept;
 	void SpawnControlWindow() noexcept;
 	const std::string& GetName();
 	CameraScript* GetCurrentScript() const noexcept;
 private:
 	DirectX::XMFLOAT3 homePos;
-	f32 homePitch, homeYaw;
+	DirectX::XMFLOAT3 homeRot;
 	DirectX::XMFLOAT3 pos;
-	f32 pitch, yaw;
+	DirectX::XMFLOAT3 rot;
 	std::string name;
 	CameraScript* script;
 };

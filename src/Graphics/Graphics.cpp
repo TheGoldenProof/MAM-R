@@ -4,6 +4,7 @@
 #include "Graphics/Camera.h"
 #include "Graphics/Resource/DepthStencil.h"
 #include "MyException.h"
+#include "TGLib\TGLib_Util.h"
 #include "Windows/Window.h"
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
@@ -158,21 +159,31 @@ void Graphics::SetCamera(DirectX::FXMMATRIX cam) noexcept { camera = cam; }
 
 DirectX::XMMATRIX Graphics::GetCamera() const noexcept { return camera; }
 
-void Graphics::SetDepthTest(bool enable) {
+void Graphics::SetDepthTest(bool enable, D3D11_COMPARISON_FUNC func, D3D11_DEPTH_WRITE_MASK mask) {
 	depthTestEnabled = enable;
+	depthTestFunc = func;
+	depthTestMask = mask;
 	HRESULT hr;
 
 	D3D11_DEPTH_STENCIL_DESC dsd{};
 	dsd.DepthEnable = enable;
-	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsd.DepthFunc = D3D11_COMPARISON_LESS;
+	dsd.DepthWriteMask = mask;
+	dsd.DepthFunc = func;
 	GFX_THROW_INFO(pDevice->CreateDepthStencilState(&dsd, &pDSState));
 
 	pContext->OMSetDepthStencilState(pDSState.Get(), 1);
 }
 
-bool Graphics::GetDepthTest() const noexcept {
+bool Graphics::GetDepthTestEnabled() const noexcept {
 	return depthTestEnabled;
+}
+
+D3D11_COMPARISON_FUNC Graphics::GetDepthTestFunc() const noexcept {
+	return depthTestFunc;
+}
+
+D3D11_DEPTH_WRITE_MASK Graphics::GetDepthTestMask() const noexcept {
+	return depthTestMask;
 }
 
 void Graphics::OnResize(u32 newWidth, u32 newHeight) {
@@ -234,7 +245,7 @@ const char* Graphics::HrException::what() const noexcept {
 const char* Graphics::HrException::GetType() const noexcept { return "Graphics Exception"; }
 HRESULT Graphics::HrException::GetErrorCode() const noexcept { return hr; }
 std::string Graphics::HrException::GetErrorString() const noexcept {
-	return Window::Exception::TranslateErrorCode(hr);
+	return TGLib::ToNarrow(Window::Exception::TranslateErrorCode(hr));
 }
 std::string Graphics::HrException::GetErrorDescription() const noexcept { return std::string(); }
 

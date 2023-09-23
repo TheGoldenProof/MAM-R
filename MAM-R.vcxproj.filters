@@ -505,9 +505,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\Colored_VS.hlsl" />
-    <FxCompile Include="shaders\Colored_PS.hlsl" />
-    <FxCompile Include="shaders\DarkenPlayed_VS.hlsl" />
-    <FxCompile Include="shaders\DarkenPlayed_PS.hlsl" />
+    <FxCompile Include="shaders_src\Colored_VS.hlsl" />
+    <FxCompile Include="shaders_src\Colored_PS.hlsl" />
+    <FxCompile Include="shaders_src\DarkenPlayed_VS.hlsl" />
+    <FxCompile Include="shaders_src\DarkenPlayed_PS.hlsl" />
+    <FxCompile Include="shaders_src\Texture_PS.hlsl" />
+    <FxCompile Include="shaders_src\Texture_VS.hlsl" />
+    <FxCompile Include="shaders_src\BGImg_PS.hlsl" />
+    <FxCompile Include="shaders_src\BGImg_VS.hlsl" />
   </ItemGroup>
 </Project>

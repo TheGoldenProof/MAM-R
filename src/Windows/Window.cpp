@@ -1,5 +1,6 @@
 #include "imgui/imgui_impl_win32.h"
 #include "mamr_defs.h"
+#include "TGLib\TGLib_Util.h"
 #include "../resource.h"
 #include "Windows\Callbacks\Callbacks.h"
 #include "Windows\DialogEventHandler.h"
@@ -326,15 +327,15 @@ LRESULT Window::HandleMsg(HWND _hWnd, UINT msg, WPARAM wParam, LPARAM lParam) no
     return 0;
 }
 
-std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept {
-    char* msgBuf;
-    DWORD msgLen = FormatMessageA(
+std::wstring Window::Exception::TranslateErrorCode(HRESULT hr) noexcept {
+    wchar_t* msgBuf;
+    DWORD msgLen = FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        nullptr, hr, 0, (LPSTR)(&msgBuf), 0, nullptr);
+        nullptr, hr, 0, (LPWSTR)(&msgBuf), 0, nullptr);
     if (msgLen == 0) {
-        return "Unknown error code";
+        return L"Unknown error code";
     }
-    std::string errorString(msgBuf);
+    std::wstring errorString(msgBuf);
     LocalFree(msgBuf);
     return errorString;
 }
@@ -355,6 +356,6 @@ const char* Window::HrException::GetType() const noexcept { return "Windows MyEx
 
 HRESULT Window::HrException::GetErrorCode() const noexcept { return hr; }
 
-std::string Window::HrException::GetErrorString() const noexcept { return TranslateErrorCode(hr); }
+std::string Window::HrException::GetErrorString() const noexcept { return TGLib::ToNarrow(TranslateErrorCode(hr)); }
 
 const char* Window::NoGfxException::GetType() const noexcept { return "Windows NoGfxException"; }

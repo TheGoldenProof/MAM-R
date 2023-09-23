@@ -40,49 +40,46 @@ DirectX::XMMATRIX Quad::GetTransformXM() const noexcept {
 }
 
 void Quad::SpawnControlWindow(Graphics& gfx, const std::string& name) noexcept {
-	constexpr f32 hp = (f32)Math::HALF_PI;
 	UNREFERENCED_PARAMETER(gfx);
 	if (ImGui::Begin(name.c_str())) {
-		ImGui::Text("Position");
-		ImGui::SliderFloat("X", &pos.x, -8.0f, 8.0f);
-		ImGui::SliderFloat("Y", &pos.y, -8.0f, 8.0f);
-		ImGui::SliderFloat("Z", &pos.z, -8.0f, 8.0f);
-		ImGui::Text("Orientation");
-		ImGui::SliderFloat("Roll", &roll, -hp, hp);
-		ImGui::SliderFloat("Pitch", &pitch, -hp, hp);
-		ImGui::SliderFloat("Yaw", &yaw, -hp, hp);
-
-		class Probe : public TechniqueProbe {
-		public:
-			void OnSetTechnique() override {
-				using namespace std::string_literals;
-				ImGui::TextColored({0.4f, 1.0f, 0.6f, 1.0f}, pTech->GetName().c_str());
-				bool active = pTech->IsActive();
-				ImGui::Checkbox(("Active##"s + std::to_string(techId)).c_str(), &active);
-				pTech->SetActive(active);
-			}
-			bool OnVisitBuffer(CBD::Buffer& buf) {
-				namespace dx = DirectX;
-				bool dirty = false;
-				const auto dcheck = [&dirty](bool changed) {dirty = dirty || changed; };
-				auto tag =[tagScratch = std::string{}, tagString = "##" + std::to_string(bufId)](const char* label) mutable {
-					tagScratch = label + tagString;
-					return tagScratch.c_str();
-				};
-				if (auto v = buf["scale"]; v.Exists()) {
-					dcheck(ImGui::SliderFloat(tag("Scale"), &v, 1.0f, 2.0f, "%.3f", ImGuiSliderFlags_Logarithmic));
-				}
-				return dirty;
-			}
-		} probe;
-
-		Accept(probe);
+		SpawnControlWindowInner();
 	}
 	ImGui::End();
 }
 
+void Quad::SpawnControlWindowInner() noexcept {
+	ImGui::Text("Position");
+	ImGui::InputFloat("X", &pos.x, 20.0f, 200.0f);
+	ImGui::InputFloat("Y", &pos.y, 20.0f, 200.0f);
+	ImGui::InputFloat("Z", &pos.z, 20.0f, 200.0f);
+	ImGui::Text("Orientation");
+	ImGui::SliderAngle("Roll", &roll, -180.0f, 180.0f);
+	ImGui::SliderAngle("Pitch", &pitch, -180.0f, 180.0f);
+	ImGui::SliderAngle("Yaw", &yaw, -180.0f, 180.0f);
+	ImGui::Text("Size");
+	ImGui::InputFloat("Width", &scaleW, 20.0f, 200.0f);
+	ImGui::InputFloat("Height", &scaleH, 20.0f, 200.0f);
+
+	class Probe : public TechniqueProbe {
+	public:
+		void OnSetTechnique() override {
+			using namespace std::string_literals;
+			ImGui::TextColored({ 0.4f, 1.0f, 0.6f, 1.0f }, pTech->GetName().c_str());
+			bool active = pTech->IsActive();
+			ImGui::Checkbox(("Active##"s + std::to_string(techId)).c_str(), &active);
+			pTech->SetActive(active);
+		}
+		bool OnVisitBuffer(CBD::Buffer& buf) {
+			UNREFERENCED_PARAMETER(buf);
+			return false;
+		}
+	} probe;
+
+	Accept(probe);
+}
+
 QuadTextured::QuadTextured(Graphics& gfx, const QuadDesc& desc) // some of the least favorite code ive written
-	: QuadTextured(gfx, desc, std::move(desc.texture.front() == '@' ?
+	: QuadTextured(gfx, desc, std::move(desc.texture.front() == L'@' ?
 		static_cast<std::shared_ptr<Texture>>(RenderTargetTexture::Resolve(gfx, desc.texture, 0))
 		: static_cast<std::shared_ptr<Texture>>(SurfaceTexture::Resolve(gfx, desc.texture, 0)))) {
 }
@@ -116,7 +113,7 @@ QuadTextured::QuadTextured(Graphics& gfx, const QuadDesc& desc, std::shared_ptr<
 
 	const std::string geometryTag = "$quadT." + std::to_string(sizeW) + "x" + std::to_string(sizeH);
 	pVerticies = VertexBuffer::Resolve(gfx, geometryTag + "." + uniqueName, std::move(vbuf));
-	std::vector<u16> indicies{ 0,1,2,1,3,2 };
+	std::vector<u32> indicies{ 0,1,2,1,3,2 };
 	pIndicies = IndexBuffer::Resolve(gfx, geometryTag, indicies.data(), indicies.size());
 	pTopology = Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -159,7 +156,7 @@ QuadColored::QuadColored(Graphics& gfx, const QuadDesc& desc) : Quad(desc.unique
 
 	const std::string geometryTag = "$quadC." + std::to_string(sizeW) + "x" + std::to_string(sizeH);
 	pVerticies = VertexBuffer::Resolve(gfx, geometryTag + "." + uniqueName, std::move(vbuf));
-	std::vector<u16> indicies{ 0,1,2,1,3,2 };
+	std::vector<u32> indicies{ 0,1,2,1,3,2 };
 	pIndicies = IndexBuffer::Resolve(gfx, geometryTag, indicies.data(), indicies.size());
 	pTopology = Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

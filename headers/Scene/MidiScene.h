@@ -1,4 +1,6 @@
 #pragma once
+#include "Graphics\Bindable\ConstantBuffers.h"
+#include "Graphics\Drawable\Quad.h"
 #include "MIDI\CookedMidi.h"
 #include "miniaudio\Sound.h"
 #include "Scene\Scene.h"
@@ -26,6 +28,12 @@ protected:
 	i32 audioOffset = 0;
 	i32 audioOffsetPrev = 0;
 
+	std::wstring imagePath;
+	std::unique_ptr<QuadTextured> pBGImg;
+	std::unique_ptr<PixelConstantBufferCaching> pBGImgTintBuf;
+	DirectX::XMFLOAT4 bgImgTint = { 1.0f, 1.0f, 1.0f, 1.0f };
+	bool clearBGImg = false;
+
 	f32 playX = 0.0f;
 public:
 	MidiScene(class Globe& gb, const std::string& name);
@@ -40,6 +48,7 @@ protected:
 	virtual void ClearVisuals(Globe& gb) = 0;
 	virtual void MovePlay(Globe& gb, f32 dx) = 0;
 	virtual void DrawGUI(class Globe& gb);
+	f32 MillisToPixels(f32 millis) const;
 private:
 	void InitMidi(class Globe& gb);
 	void UpdateTPS(class Globe& gb);

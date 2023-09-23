@@ -12,6 +12,9 @@ private:
 	f32 zSpacing = 15.0f;
 	f32 zSpacingPrev = 0.0f;
 	f32 velocityFactor = 0.75f;
+	f32 noteHeight = 10.0f;
+	f32 noteVSpacing = 2.0f;
+	f32 noteHSpacing = 2.0f;
 	std::vector<std::array<f32, 4>> trackColors;
 public:
 	TestScene(class Globe& gb);

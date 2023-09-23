@@ -18,7 +18,7 @@ protected:
 	const usize maxQuadCount;
 
 	Vtx::VertexBuffer vbuf;
-	std::vector<u16, allocator<u16>> indicies;
+	std::vector<u32, allocator<u32>> indicies;
 private:
 	DirectX::XMFLOAT3 pos{ 0.0f, 0.0f, 0.0f };
 	f32 pitch = 0;
@@ -48,8 +48,8 @@ public:
 class QuadBatchTextured : public QuadBatch {
 	struct BatchDesc {
 		std::string uniqueName;
-		usize maxQuadCount = 1024; // absolute maximum of 16383 because vertex index is stored as u16 (65535/4 = 16383)
-		std::string texture;
+		usize maxQuadCount = 1024; // absolute maximum of MAX_INT/4
+		std::wstring texture;
 		usize layer = 0;
 		D3D11_FILTER filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		std::string vertexShader = "VS_Texture.cso";
@@ -82,7 +82,7 @@ class QuadBatchColored : public QuadBatch {
 public:
 	struct BatchDesc {
 		std::string uniqueName;
-		usize maxQuadCount = 1024; // absolute maximum of 16383 because vertex index is stored as u16 (65535/4 = 16383)
+		usize maxQuadCount = 1024; // absolute maximum of MAX_INT/4
 		usize layer = 0;
 		std::string vertexShader = "Colored_VS.cso";
 		std::string pixelShader = "Colored_PS.cso";

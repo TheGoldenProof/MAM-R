@@ -1,4 +1,4 @@
-cbuffer Cbuf
+cbuffer Cbuf : register(b0)
 {
     float planeX;
 };

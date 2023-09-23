@@ -6,7 +6,6 @@ ImguiManager::ImguiManager() {
 	ctx = ImGui::CreateContext();
 	ImGui::SetCurrentContext(ctx);
 	ImGui::StyleColorsDark();
-	ImGui::GetStyle().ScaleAllSizes(2.0f);
 }
 
 ImguiManager::~ImguiManager() {

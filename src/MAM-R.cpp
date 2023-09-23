@@ -69,10 +69,8 @@ App::App(HINSTANCE hInstance) : hInstance(hInstance), wnd(MAMR_WINW, MAMR_WINH, 
 App::~App() {}
 
 i32 App::Run() {
-    auto pBlender = Blender::Resolve(wnd.Gfx(), true, {});
-    auto pRasterizer = Rasterizer::Resolve(wnd.Gfx(), true);
-    pBlender->Bind(wnd.Gfx());
-    pRasterizer->Bind(wnd.Gfx());
+    Blender::Resolve(wnd.Gfx(), true, {})->Bind(gb.Gfx());
+    Rasterizer::Resolve(wnd.Gfx(), false)->Bind(gb.Gfx());
 
     TGLib::Timer mainTimer;
     TGLib::Timer windowTimer;
@@ -155,7 +153,7 @@ void App::Draw(f32 dt) {
 
     //if (show_demo_window && gb.Gfx().IsImguiEnabled()) 
     //ImGui::ShowDemoWindow();
-    //gb.Cams().SpawnWindowFor("Camera0");
+    gb.Cams().SpawnWindowFor("Camera0");
 
     if (gb.Gfx().IsImDebugEnabled()) {
         f32 avgTps = std::accumulate(tpsArr.begin(), tpsArr.end(), 0.0f) / tpsArr.size();
