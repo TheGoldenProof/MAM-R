@@ -42,7 +42,7 @@ private:
 		WinAPIClass(const WinAPIClass&) = delete;
 		~WinAPIClass();
 		WinAPIClass& operator=(const WinAPIClass&) = delete;
-		static constexpr LPCWSTR wndClassName = L"MAMR";
+		static constexpr LPCWSTR wndClassName = L"OMIDIV";
 		static WinAPIClass wndClass;
 		HINSTANCE hInstance;
 		HACCEL hAccelTable;

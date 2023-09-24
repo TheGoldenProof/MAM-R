@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/DxgiInfoManager.h"
-#include "mamr_defs.h"
+#include "omidiv_defs.h"
 #include "MyException.h"
 #include "TGLib/TGLib.h"
 #include "Windows/framework.h"

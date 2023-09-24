@@ -1,4 +1,4 @@
-#include "mamr_defs.h"
+#include "omidiv_defs.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/GraphicsMacros.h"
 #include "Graphics/Camera.h"
@@ -85,8 +85,8 @@ Graphics::Graphics(HWND hWnd, u32 width, u32 height) : width(width), height(heig
 	pDepthStencil = std::make_unique<DepthStencil>(*this, width, height);
 
 	D3D11_VIEWPORT vp{};
-	vp.Width = MAMR_WINW;
-	vp.Height = MAMR_WINH;
+	vp.Width = OMIDIV_WINW;
+	vp.Height = OMIDIV_WINH;
 	vp.MinDepth = 0;
 	vp.MaxDepth = 1;
 	vp.TopLeftX = 0;

@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\MAM-R.h">
+    <ClInclude Include="headers\OMIDIV.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\Globe.h">
@@ -129,7 +129,7 @@
     <ClInclude Include="headers\ImguiManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\mamr_defs.h">
+    <ClInclude Include="headers\omidiv_defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\MyException.h">
@@ -287,7 +287,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\MAM-R.cpp">
+    <ClCompile Include="src\OMIDIV.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Globe.cpp">
@@ -490,7 +490,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MAM-R.rc">
+    <ResourceCompile Include="OMIDIV.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -498,7 +498,7 @@
     <Image Include="small.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="MAM-R.ico">
+    <Image Include="OMIDIV.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

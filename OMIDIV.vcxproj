@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -18,7 +18,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{f9e3fcaa-ee66-4dee-9b19-7958b68a67bc}</ProjectGuid>
-    <RootNamespace>MAMR</RootNamespace>
+    <RootNamespace>OMIDIV</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -197,8 +197,8 @@
     <ClInclude Include="headers\Graphics\Surface.h" />
     <ClInclude Include="headers\Graphics\Vertex.h" />
     <ClInclude Include="headers\ImguiManager.h" />
-    <ClInclude Include="headers\MAM-R.h" />
-    <ClInclude Include="headers\mamr_defs.h" />
+    <ClInclude Include="headers\OMIDIV.h" />
+    <ClInclude Include="headers\omidiv_defs.h" />
     <ClInclude Include="headers\MIDI\RawMidi.h" />
     <ClInclude Include="headers\MIDI\Enums.h" />
     <ClInclude Include="headers\MIDI\Parser\MidiEvent.inl" />
@@ -284,7 +284,7 @@
     <ClCompile Include="src\Graphics\Surface.cpp" />
     <ClCompile Include="src\Graphics\Vertex.cpp" />
     <ClCompile Include="src\ImguiManager.cpp" />
-    <ClCompile Include="src\MAM-R.cpp" />
+    <ClCompile Include="src\OMIDIV.cpp" />
     <ClCompile Include="src\MIDI\CookedMidi.cpp" />
     <ClCompile Include="src\MIDI\RawMidi.cpp" />
     <ClCompile Include="src\MIDI\Parser\Chunks.cpp" />
@@ -320,10 +320,10 @@
     <ClCompile Include="ThirdParty\TGLib\TGLib_Util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MAM-R.rc" />
+    <ResourceCompile Include="OMIDIV.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="MAM-R.ico" />
+    <Image Include="OMIDIV.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>

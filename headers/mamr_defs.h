@@ -1,5 +1,5 @@
 #pragma once
 
-#define MAMR_MAX_LOADSTRING 128
-#define MAMR_WINW 1280
-#define MAMR_WINH 960
+#define OMIDIV_MAX_LOADSTRING 128
+#define OMIDIV_WINW 1280
+#define OMIDIV_WINH 960

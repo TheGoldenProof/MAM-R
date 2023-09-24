@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mamr_defs.h"
+#include "omidiv_defs.h"
 #include "TGLib\TGLib.h"
 #include "TGLib\Timer.h"
 

@@ -19,8 +19,8 @@ void Config::Clear() {
 }
 
 void Config::Open(Globe& gb) {
-	static std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { {L"Config files", L"*.mamrcfg"}, {L"All files", L"*.*"} };
-	currPath = gb.Wnd().OpenFile(fileTypes, 1, L".mamrcfg");
+	static std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { {L"Config files", L"*.omvcfg"}, {L"All files", L"*.*"} };
+	currPath = gb.Wnd().OpenFile(fileTypes, 1, L".omvcfg");
 	Read(currPath);
 }
 
@@ -30,8 +30,8 @@ void Config::Save(Globe& gb) {
 }
 
 void Config::SaveAs(Globe& gb) {
-	static std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { {L"Config files", L"*.mamrcfg"}, {L"All files", L"*.*"} };
-	currPath = gb.Wnd().SaveFile(fileTypes, 1, L".mamrcfg");
+	static std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { {L"Config files", L"*.omvcfg"}, {L"All files", L"*.*"} };
+	currPath = gb.Wnd().SaveFile(fileTypes, 1, L".omvcfg");
 	Save(gb);
 }
 

@@ -1,4 +1,4 @@
-// MAM-R.cpp : Defines the entry point for the application.
+// OMIDIV.cpp : Defines the entry point for the application.
 //
 
 #include "Graphics\Bindable\Bindables.h"
@@ -6,7 +6,7 @@
 #include "Scene\Scenes.h"
 #include "Windows/framework.h"
 #include "../resource.h"
-#include "MAM-R.h"
+#include "OMIDIV.h"
 #include "Util\DXUtil.h"
 #include "Util\MyMath.h"
 #include <numeric>
@@ -38,10 +38,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return ret;
 }
 
-App::App(HINSTANCE hInstance) : hInstance(hInstance), wnd(MAMR_WINW, MAMR_WINH, L""), frameCtrl(wnd.Gfx()) {
+App::App(HINSTANCE hInstance) : hInstance(hInstance), wnd(OMIDIV_WINW, OMIDIV_WINH, L""), frameCtrl(wnd.Gfx()) {
 
-    WCHAR wndTitle[MAMR_MAX_LOADSTRING];
-    LoadStringW(hInstance, IDS_APP_TITLE, wndTitle, MAMR_MAX_LOADSTRING);
+    WCHAR wndTitle[OMIDIV_MAX_LOADSTRING];
+    LoadStringW(hInstance, IDS_APP_TITLE, wndTitle, OMIDIV_MAX_LOADSTRING);
 
     gb.pWnd = &wnd;
     gb.pGraphics = &wnd.Gfx();
@@ -64,7 +64,7 @@ App::App(HINSTANCE hInstance) : hInstance(hInstance), wnd(MAMR_WINW, MAMR_WINH, 
     sceneCtrl.AddScene(std::make_unique<TestScene>(gb));
     sceneCtrl.SetActive(gb, "testScene0");
 
-    //auto proj = DXUtil::CustomOrthoProj(MAMR_WINW, MAMR_WINH);
+    //auto proj = DXUtil::CustomOrthoProj(OMIDIV_WINW, OMIDIV_WINH);
 }
 
 App::~App() {}

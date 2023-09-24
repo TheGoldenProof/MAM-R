@@ -1,4 +1,4 @@
-#include "mamr_defs.h"
+#include "omidiv_defs.h"
 #include "Globe.h"
 #include "Graphics/Bindable/Bindables.h"
 #include "Graphics/Camera.h"
@@ -53,7 +53,7 @@ void FrameController::Execute(Globe& gb) dbgexcept {
 	gb.Cams().SetActive("HUD cam");
 	gb.Cams().BindActive(gb.Gfx());
 	gfx.SetProjection(DXUtil::CustomOrthoProj(static_cast<f32>(gfx.GetWidth()), static_cast<f32>(gfx.GetHeight())));
-	//gfx.SetProjection(DXUtil::CustomOrthoProj(MAMR_WINW, MAMR_WINH));
+	//gfx.SetProjection(DXUtil::CustomOrthoProj(OMIDIV_WINW, OMIDIV_WINH));
 
 	gfx.SetDepthTest(true, D3D11_COMPARISON_EQUAL, D3D11_DEPTH_WRITE_MASK_ZERO);
 	passes[16].Execute(gfx);

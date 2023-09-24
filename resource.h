@@ -1,16 +1,16 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by MAM-R.rc
+// Used by OMIDIV.rc
 //
 #define IDC_MYICON                      2
-#define IDD_MAMR_DIALOG                 102
+#define IDD_OMIDIV_DIALOG               102
 #define IDS_APP_TITLE                   103
 #define IDD_ABOUTBOX                    103
 #define IDM_ABOUT                       104
 #define IDM_EXIT                        105
-#define IDI_MAMR                        107
+#define IDI_OMIDIV                      107
 #define IDI_SMALL                       108
-#define IDC_MAMR                        109
+#define IDC_OMIDIV                        109
 #define IDR_MAINFRAME                   128
 #define ID_FILE_OPEN                    32771
 #define IDC_STATIC                      -1

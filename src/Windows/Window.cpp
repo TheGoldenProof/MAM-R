@@ -1,5 +1,5 @@
 #include "imgui/imgui_impl_win32.h"
-#include "mamr_defs.h"
+#include "omidiv_defs.h"
 #include "TGLib\TGLib_Util.h"
 #include "../resource.h"
 #include "Windows\Callbacks\Callbacks.h"
@@ -23,16 +23,16 @@ Window::WinAPIClass::WinAPIClass() noexcept : hInstance(GetModuleHandle(nullptr)
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
     wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MAMR));
+    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_OMIDIV));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = nullptr;
-    wcex.lpszMenuName   = nullptr; //MAKEINTRESOURCEW(IDC_MAMR);
+    wcex.lpszMenuName   = nullptr; //MAKEINTRESOURCEW(IDC_OMIDIV);
     wcex.lpszClassName  = wndClassName;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     RegisterClassExW(&wcex);
 
-    hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MAMR));
+    hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_OMIDIV));
 }
 
 Window::WinAPIClass::~WinAPIClass() { UnregisterClass(wndClassName, hInstance); }
