@@ -3,7 +3,7 @@
 #include "Graphics/Bindable/BindableCodex.h"
 
 IndexBuffer::IndexBuffer(Graphics& gfx, const std::string& tag, const u32* pData, usize count, bool updatable_, u32 maxCount_)
-	: tag(tag), indexCount(u32(count)), updatable(updatable_), maxCount(u32(max(maxCount_, count))) {
+	: tag(tag), indexCount(u32(count)), updatable(updatable_), maxCount(std::max(maxCount_, (u32)count)) {
 	INFOMAN(gfx);
 
 	D3D11_BUFFER_DESC bd{};
@@ -26,10 +26,10 @@ void IndexBuffer::Update(Graphics& gfx, const u32* data, usize count_) {
 	GFX_THROW_INFO(GetContext(gfx)->Map(pIndexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	const usize dataSize = maxCount * sizeof(u32);
 	const usize vbufSize = count_ * sizeof(u32);
-	memcpy_s(msr.pData, dataSize, data, min(dataSize, vbufSize));
+	memcpy_s(msr.pData, dataSize, data, std::min(dataSize, vbufSize));
 	GetContext(gfx)->Unmap(pIndexBuffer.Get(), 0);
 
-	indexCount = u32(min(count_, maxCount));
+	indexCount = std::min((u32)count_, maxCount);
 }
 
 void IndexBuffer::Bind(Graphics& gfx) noexcept {

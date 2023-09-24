@@ -24,6 +24,8 @@ protected:
 	virtual void ClearVisuals(Globe& gb) override;
 	virtual void MovePlay(Globe& gb, f32 dx) override;
 	virtual void DrawGUI(Globe& gb) override;
+	virtual void WriteConfig(Globe& gb) override;
+	virtual void ReadConfig(Globe& gb) override;
 private:
 	void UpdateInputs(Globe& gb);
 };

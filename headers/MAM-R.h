@@ -8,6 +8,7 @@
 #include "Scene\SceneController.h"
 #include "TGLib/TGLib.h"
 #include "Windows/Window.h"
+#include "Config.h"
 
 class App {
 public:
@@ -28,6 +29,7 @@ private:
 	FrameController frameCtrl;
 	SceneController sceneCtrl;
 	AudioEngine audioEngine;
+	Config cfg;
 
 	std::array<f32, 60> tpsArr = {};
 	usize tpsI = 0;

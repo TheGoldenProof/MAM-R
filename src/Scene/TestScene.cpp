@@ -1,3 +1,4 @@
+#include "Config.h"
 #include "Globe.h"
 #include "Graphics\Camera.h"
 #include "Graphics\Drawable\Drawables.h"
@@ -74,7 +75,7 @@ void TestScene::InitVisuals(Globe& gb) {
 	for (usize i = 0; i < midi.GetTracks().size(); i++) {
 		const MIDI::Track& track = midi.GetTracks()[i];
 		auto trackColor = trackColors[i % trackColors.size()];
-		const usize noteCount = min(0x7fffffff/24, track.notes.size());
+		const usize noteCount = std::min(0x7fffffff/24ull, track.notes.size());
 		if (noteCount == 0) continue;
 		QuadBatchColored::BatchDesc desc{
 			.uniqueName = std::format("ts0qbc{:d}", i),
@@ -137,8 +138,8 @@ void TestScene::InitVisuals(Globe& gb) {
 		pQbatch->SetPos({ 0, 0, i * zSpacing + 1 });
 
 		pQbatch->FlushChanges(gb.Gfx());
-		const u32 indexCount = pQbatch->GetIndexCount();
-		maxIndexCount = max(maxIndexCount, indexCount);
+		const usize indexCount = pQbatch->GetIndexCount();
+		maxIndexCount = std::max(maxIndexCount, indexCount);
 		trackVisuals.emplace_back(std::move(pQbatch));
 	}
 
@@ -215,6 +216,48 @@ void TestScene::DrawGUI(Globe& gb) {
 
 	}
 	ImGui::End();
+}
+
+void TestScene::WriteConfig(Globe& gb) {
+	MidiScene::WriteConfig(gb);
+
+	Config& cfg = gb.Cfg();
+	cfg.Set("ts.zSpacing", zSpacing);
+	cfg.Set("ts.velFactor", velocityFactor);
+	cfg.Set("ts.noteHeight", noteHeight);
+	cfg.Set("ts.noteVSpacing", noteVSpacing);
+	cfg.Set("ts.noteHSpacing", noteHSpacing);
+	cfg.Set("ts.trackColors", trackColors.data(), trackColors.size());
+
+	if (auto opCam = gb.Cams().GetCamera("Camera0"); opCam) {
+		Camera& cam = opCam.value().get();
+		cfg.Set("ts.cam.homePos", cam.GetHomePos());
+		cfg.Set("ts.cam.homeRot", cam.GetHomeRotation());
+	}
+}
+
+void TestScene::ReadConfig(Globe& gb) {
+	MidiScene::ReadConfig(gb);
+
+	Config& cfg = gb.Cfg();
+	cfg.Get("ts.zSpacing", &zSpacing);
+	cfg.Get("ts.velFactor", &velocityFactor);
+	cfg.Get("ts.noteHeight", &noteHeight);
+	cfg.Get("ts.noteVSpacing", &noteVSpacing);
+	cfg.Get("ts.noteHSpacing", &noteHSpacing);
+	trackColors.resize(cfg()["ts.trackColors"].size() / (sizeof(f32) * 4));
+	cfg.Get("ts.trackColors", trackColors.data());
+
+	if (auto opCam = gb.Cams().GetCamera("Camera0"); opCam) {
+		Camera& cam = opCam.value().get();
+		DirectX::XMFLOAT3 homePos(0, 0, 0);
+		DirectX::XMFLOAT3 homeRot(0, 0, 0);
+		cfg.Get("ts.cam.homePos", &homePos);
+		cfg.Get("ts.cam.homeRot", &homeRot);
+		cam.SetHomePos(homePos);
+		cam.SetHomeRotation(homeRot);
+		cam.Reset();
+	}
 }
 
 void TestScene::UpdateInputs(Globe& gb) {

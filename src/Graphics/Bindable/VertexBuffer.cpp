@@ -5,7 +5,7 @@ VertexBuffer::VertexBuffer(Graphics& gfx, const Vtx::VertexBuffer& vbuf, bool up
 	: VertexBuffer(gfx, "?", vbuf, updatable_, maxCount_) {}
 
 VertexBuffer::VertexBuffer(Graphics& gfx, const std::string& tag, const Vtx::VertexBuffer& vbuf, bool updatable_, u32 maxCount_)
-	: stride((u32)vbuf.GetLayout().Size()), tag(tag), layout(vbuf.GetLayout()), updatable(updatable_), maxCount(u32(max(maxCount_, vbuf.Size()))) {
+	: stride((u32)vbuf.GetLayout().Size()), tag(tag), layout(vbuf.GetLayout()), updatable(updatable_), maxCount(std::max(maxCount_, (u32)vbuf.Size())) {
 	INFOMAN(gfx);
 
 	D3D11_BUFFER_DESC bd{};
@@ -29,7 +29,7 @@ void VertexBuffer::Update(Graphics& gfx, const Vtx::VertexBuffer& vbuf) {
 	GFX_THROW_INFO(GetContext(gfx)->Map(pVertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	const usize dataSize = maxCount * stride;
 	const usize vbufSize = vbuf.SizeBytes();
-	memcpy_s(msr.pData, dataSize, vbuf.GetData(), min(dataSize, vbufSize));
+	memcpy_s(msr.pData, dataSize, vbuf.GetData(), std::min(dataSize, vbufSize));
 	GetContext(gfx)->Unmap(pVertexBuffer.Get(), 0);
 }
 

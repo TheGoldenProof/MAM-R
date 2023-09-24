@@ -1,3 +1,4 @@
+#include "Config.h"
 #include "Globe.h"
 #include "Graphics\Camera.h"
 #include "Graphics\Drawable\Drawables.h"
@@ -139,11 +140,17 @@ void MidiScene::DrawGUI(Globe& gb) {
 	bool bOpenMIDI = false;
 	bool bOpenAudio = false;
 	bool bOpenImage = false;
+	bool bOpenConfig = false;
+	bool bSaveConfig = false;
+	bool bSaveConfigAs = false;
 
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
 			ImGui::MenuItem("Open MIDI", nullptr, &bOpenMIDI);
 			ImGui::MenuItem("Open Audio", nullptr, &bOpenAudio);
+			ImGui::MenuItem("Open Config", nullptr, &bOpenConfig);
+			ImGui::MenuItem("Save Config", nullptr, &bSaveConfig);
+			ImGui::MenuItem("Save Config As", nullptr, &bSaveConfigAs);
 			ImGui::EndMenu();
 		}
 
@@ -228,6 +235,19 @@ void MidiScene::DrawGUI(Globe& gb) {
 		};
 		imagePath = gb.Wnd().OpenFile(fileTypes, 1, L".png");
 	}
+
+	if (bOpenConfig) {
+		gb.Cfg().Open(gb);
+		ReadConfig(gb);
+	}
+	if (bSaveConfig) {
+		WriteConfig(gb);
+		gb.Cfg().Save(gb);
+	}
+	if (bSaveConfigAs) {
+		WriteConfig(gb);
+		gb.Cfg().SaveAs(gb);
+	}
 }
 
 f32 MidiScene::MillisToPixels(f32 millis) const {
@@ -282,4 +302,14 @@ void MidiScene::UpdateTPS(Globe& gb) {
 		tempoMapIndex++;
 	}
 
+}
+
+void MidiScene::WriteConfig(Globe& gb) {
+	Config& cfg = gb.Cfg();
+	cfg.Set("bgColor", gb.clearColor, _countof(gb.clearColor));
+}
+
+void MidiScene::ReadConfig(Globe& gb) {
+	Config& cfg = gb.Cfg();
+	cfg.Get("bgColor", gb.clearColor, _countof(gb.clearColor));
 }

@@ -15,6 +15,7 @@ private:
 	class Keyboard* pKeyboard = nullptr;
 	class Mouse* pMouse = nullptr;
 	class AudioEngine* pAudio = nullptr;
+	class Config* pCfg = nullptr;
 
 	TGLib::Timer lifeTimer;
 
@@ -36,6 +37,7 @@ public:
 	Keyboard& Kbd() const { return *pKeyboard; }
 	Mouse& Mouse() const { return *pMouse; }
 	AudioEngine& Audio() const { return *pAudio; }
+	Config& Cfg() const { return *pCfg; }
 
 	f32 LifeTime() const noexcept { return lifeTimer.Peek(); }
 

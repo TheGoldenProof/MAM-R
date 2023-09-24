@@ -159,6 +159,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="headers\Config.h" />
     <ClInclude Include="headers\Globe.h" />
     <ClInclude Include="headers\Graphics\Bindable\Bindable.h" />
     <ClInclude Include="headers\Graphics\Bindable\BindableCodex.h" />
@@ -250,6 +251,7 @@
     <ClInclude Include="ThirdParty\TGLib\TGLib_Util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Globe.cpp" />
     <ClCompile Include="src\Graphics\Bindable\Blender.cpp" />
     <ClCompile Include="src\Graphics\Bindable\ConstantBuffers.cpp" />

@@ -64,10 +64,12 @@ public:
 	bool IsFullscreen() const noexcept;
 
 	std::wstring OpenFile(const std::vector<std::pair<const wchar_t*, const wchar_t*>>& saveTypes, u32 fileTypeIndex, const wchar_t* defaultExtension);
+	std::wstring SaveFile(const std::vector<std::pair<const wchar_t*, const wchar_t*>>& saveTypes, u32 fileTypeIndex, const wchar_t* defaultExtension);
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	std::wstring FileDialog(const CLSID& clsid, const std::vector<std::pair<const wchar_t*, const wchar_t*>>& saveTypes, u32 fileTypeIndex, const wchar_t* defaultExtension);
 public:
 	Keyboard kbd;
 	Mouse mouse;

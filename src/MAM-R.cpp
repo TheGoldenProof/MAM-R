@@ -51,6 +51,7 @@ App::App(HINSTANCE hInstance) : hInstance(hInstance), wnd(MAMR_WINW, MAMR_WINH, 
     gb.pKeyboard = &wnd.kbd;
     gb.pMouse = &wnd.mouse;
     gb.pAudio = &audioEngine;
+    gb.pCfg = &cfg;
     gb.TargetFPS(gb.Gfx().GetRefreshRate());
     gb.TargetTPS(gb.TargetFPS());
 

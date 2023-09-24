@@ -124,8 +124,16 @@ bool Window::IsFullscreen() const noexcept {
 }
 
 std::wstring Window::OpenFile(const std::vector<std::pair<const wchar_t*, const wchar_t*>>& saveTypes, u32 fileTypeIndex, const wchar_t* defaultExtension) {
+    return FileDialog(CLSID_FileOpenDialog, saveTypes, fileTypeIndex, defaultExtension);
+}
+
+std::wstring Window::SaveFile(const std::vector<std::pair<const wchar_t*, const wchar_t*>>& saveTypes, u32 fileTypeIndex, const wchar_t* defaultExtension) {
+    return FileDialog(CLSID_FileSaveDialog, saveTypes, fileTypeIndex, defaultExtension);
+}
+
+std::wstring Window::FileDialog(const CLSID& clsid, const std::vector<std::pair<const wchar_t*, const wchar_t*>>& saveTypes, u32 fileTypeIndex, const wchar_t* defaultExtension) {
     IFileDialog* pfd = nullptr;
-    HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd));
+    HRESULT hr = CoCreateInstance(clsid, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd));
     if (SUCCEEDED(hr)) {
 
         IFileDialogEvents* pfde = nullptr;

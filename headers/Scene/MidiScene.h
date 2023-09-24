@@ -48,6 +48,8 @@ protected:
 	virtual void ClearVisuals(Globe& gb) = 0;
 	virtual void MovePlay(Globe& gb, f32 dx) = 0;
 	virtual void DrawGUI(class Globe& gb);
+	virtual void WriteConfig(Globe& gb);
+	virtual void ReadConfig(Globe& gb);
 	f32 MillisToPixels(f32 millis) const;
 private:
 	void InitMidi(class Globe& gb);
