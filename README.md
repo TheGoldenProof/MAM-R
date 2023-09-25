@@ -8,7 +8,7 @@ If the audio doesn't sync up with the notes, use the Offset (ms) in the audio or
 If you change something and it doesn't do anything, try pressing F6 (to reload the midi, can be done while playing), or F5 (to reload and reset everything).
 
 Demo video:  
-[Open MIDI Visualizer (Alpha Demo)](https://youtu.be/_BMzSGtBYbQ)
+[Open MIDI Visualizer (Alpha Demo)](https://youtu.be/4YJwQmvFq10)
 
 ## Todo list
 
