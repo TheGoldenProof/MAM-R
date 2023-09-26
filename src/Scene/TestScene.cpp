@@ -8,6 +8,7 @@
 #include "Util\MyMath.h"
 #include "Windows\Keyboard.h"
 #include "Windows\Mouse.h"
+#include <cmath>
 #include <format>
 
 TestScene::TestScene(Globe& gb) : MidiScene(gb, "testScene0") {
@@ -90,48 +91,57 @@ void TestScene::InitVisuals(Globe& gb) {
 			const f32 noteLength = note.lengthTicks * lengthScale;
 			auto velScale = [&note, this](f32 val) {return val * (note.velocity / 128.0f * velocityFactor + (1.0f - velocityFactor)); };
 
-			// Front
-			QuadBatchColored::QuadDesc fdesc{
-				.position = {note.startTick * lengthScale + noteLength * 0.5f + noteHSpacing/2, (note.pitch - 64) * (noteHeight + noteVSpacing), 0},
+			const f32 noteX = note.startTick * lengthScale + noteLength * 0.5f + noteHSpacing / 2;
+			const f32 noteYBase = (note.pitch - 64) * (noteHeight + noteVSpacing);
+
+			QuadBatchColored::QuadDesc edesc{
+				.position = {noteX, 0, 0},
 				.rotation = {0, 0, 0},
 				.size = {noteLength - noteHSpacing, noteHeight},
 				.singleColor = true,
 				.colors = {{{velScale(trackColor[0]), velScale(trackColor[1]), velScale(trackColor[2]), 1.0f}, {}, {}, {}}}
 			};
-			pQbatch->AddOneQuad(fdesc);
 
-			QuadBatchColored::QuadDesc ndesc = fdesc;
+			QuadBatchColored::QuadDesc endD = edesc;
 
-			// Top
-			ndesc.position.y = fdesc.position.y + noteHeight / 2;
-			ndesc.position.z = noteHeight / 2;
-			ndesc.rotation.x += Math::HALF_PI;
-			pQbatch->AddOneQuad(ndesc);
+			constexpr f32 inradii[] = { 0.0f, 0.0f, 0.0f, 0.2886751346f, 0.5f, 0.6881909602f, 0.8660254038f };
+			const f32 radius = inradii[noteType];
+			for (i32 k = 0; k < noteType; k++) {
+				const f32 theta = Math::to_rad(360.0f / noteType * k - 90.0f) + noteRotation;
+				edesc.rotation.x = theta;
+				edesc.position.y = noteYBase + radius * sin(theta) * noteHeight;
+				edesc.position.z = -radius * cos(theta) * noteHeight;
+				pQbatch->AddOneQuad(edesc);
+			}
 
-			// Back
-			ndesc.position.y = fdesc.position.y;
-			ndesc.position.z = noteHeight;
-			ndesc.rotation.x += Math::HALF_PI;
-			pQbatch->AddOneQuad(ndesc);
+			endD.position.x = note.startTick * lengthScale + noteHSpacing;
+			endD.rotation.z = noteRotation;
+			endD.rotation.y = Math::HALF_PI;
 
-			// Bottom
-			ndesc.position.y = fdesc.position.y - noteHeight / 2;
-			ndesc.position.z = noteHeight / 2;
-			ndesc.rotation.x += Math::HALF_PI;
-			pQbatch->AddOneQuad(ndesc);
+			if (noteType == 4) {
+				// Left
+				endD.position.y = noteYBase;
+				endD.size.x = noteHeight;
+				pQbatch->AddOneQuad(endD);
+				// Right
+				endD.position.x = note.startTick * lengthScale + noteLength;
+				endD.rotation.y = -Math::HALF_PI;
+				pQbatch->AddOneQuad(endD);
 
-			// Left
-			ndesc.position.x = note.startTick * lengthScale + noteHSpacing;
-			ndesc.position.y = fdesc.position.y;
-			ndesc.rotation.x = 0;
-			ndesc.rotation.y = Math::HALF_PI;
-			ndesc.size.x = noteHeight;
-			pQbatch->AddOneQuad(ndesc);
-
-			// Right
-			ndesc.position.x = note.startTick * lengthScale + noteLength;
-			ndesc.rotation.y = -Math::HALF_PI;
-			pQbatch->AddOneQuad(ndesc);
+			} else if (noteType == 3) {
+				constexpr f32 root3on2 = 1.7320508075688772935274463415059f / 2.0f;
+				constexpr f32 root3on12 = 1.7320508075688772935274463415059f / 12.0f;
+				// Left
+				endD.size.x = noteHeight;
+				endD.size.y = noteHeight * root3on2;
+				endD.position.y = noteYBase + root3on12 * noteHeight * cos(noteRotation);
+				endD.position.z = root3on12 * noteHeight * sin(noteRotation);
+				pQbatch->AddOneTriangle(endD);
+				// Right
+				endD.position.x = note.startTick * lengthScale + noteLength;
+				endD.rotation.y = -Math::HALF_PI;
+				pQbatch->AddOneTriangle(endD);
+			}
 
 		}
 
@@ -181,6 +191,8 @@ void TestScene::DrawGUI(Globe& gb) {
 		if (ImGui::TreeNode("Note Options")) {
 			ImGui::PushItemWidth(128.0f);
 			ImGui::SliderFloat("Velocity Intensity", &velocityFactor, 0.0f, 1.0f);
+			ImGui::SliderInt("Note Sides", &noteType, 3, 4);
+			ImGui::SliderAngle("Note Rotation", &noteRotation, -180.0f, 180.0f);
 			ImGui::InputFloat("Height", &noteHeight);
 			ImGui::InputFloat("Vertical Spacing", &noteVSpacing);
 			ImGui::InputFloat("Length Factor", &lengthScale);
@@ -224,6 +236,8 @@ void TestScene::WriteConfig(Globe& gb) {
 	Config& cfg = gb.Cfg();
 	cfg.Set("ts.zSpacing", zSpacing);
 	cfg.Set("ts.velFactor", velocityFactor);
+	cfg.Set("ts.noteType", noteType);
+	cfg.Set("ts.noteRotation", noteRotation);
 	cfg.Set("ts.noteHeight", noteHeight);
 	cfg.Set("ts.noteVSpacing", noteVSpacing);
 	cfg.Set("ts.noteHSpacing", noteHSpacing);
@@ -242,6 +256,8 @@ void TestScene::ReadConfig(Globe& gb) {
 	Config& cfg = gb.Cfg();
 	cfg.Get("ts.zSpacing", &zSpacing);
 	cfg.Get("ts.velFactor", &velocityFactor);
+	cfg.Get("ts.noteType", &noteType);
+	cfg.Get("ts.noteRotation", &noteRotation);
 	cfg.Get("ts.noteHeight", &noteHeight);
 	cfg.Get("ts.noteVSpacing", &noteVSpacing);
 	cfg.Get("ts.noteHSpacing", &noteHSpacing);

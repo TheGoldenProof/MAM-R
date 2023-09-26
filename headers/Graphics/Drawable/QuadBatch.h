@@ -99,6 +99,7 @@ public:
 	QuadBatchColored(Graphics& gfx, const BatchDesc& desc);
 
 	void AddOneQuad(const QuadDesc& quad);
+	void AddOneTriangle(const QuadDesc& triangle);
 	template<typename Iter> requires (std::is_same_v<typename std::iterator_traits<Iter>::value_type, QuadDesc>)
 		void AddManyQuads(Iter begin, Iter end) {
 		for (Iter i = begin; i != end; i++)

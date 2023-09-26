@@ -154,7 +154,7 @@ void App::Draw(f32 dt) {
 
     //if (show_demo_window && gb.Gfx().IsImguiEnabled()) 
     //ImGui::ShowDemoWindow();
-    gb.Cams().SpawnWindowFor("Camera0");
+    if (gb.Gfx().IsImguiEnabled()) gb.Cams().SpawnWindowFor("Camera0");
 
     if (gb.Gfx().IsImDebugEnabled()) {
         f32 avgTps = std::accumulate(tpsArr.begin(), tpsArr.end(), 0.0f) / tpsArr.size();

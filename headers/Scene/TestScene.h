@@ -12,6 +12,8 @@ private:
 	f32 zSpacing = 15.0f;
 	f32 zSpacingPrev = 0.0f;
 	f32 velocityFactor = 0.75f;
+	i32 noteType = 4;
+	f32 noteRotation = 0.0f;
 	f32 noteHeight = 10.0f;
 	f32 noteVSpacing = 2.0f;
 	f32 noteHSpacing = 2.0f;

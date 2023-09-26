@@ -195,3 +195,29 @@ void QuadBatchColored::AddOneQuad(const QuadDesc& quad) {
 
 	indicies.resize(indicies.size() + 6);
 }
+
+void QuadBatchColored::AddOneTriangle(const QuadDesc& triangle) {
+	using namespace DirectX;
+	XMVECTOR pos_ = XMLoadFloat3(&triangle.position);
+	XMVECTOR rot = XMQuaternionRotationRollPitchYaw(triangle.rotation.x, triangle.rotation.y, triangle.rotation.z);
+	XMVECTOR scl = XMLoadFloat2(&triangle.size);
+	XMMATRIX trfm = XMMatrixAffineTransformation(scl, XMVectorZero(), rot, pos_);
+	XMVECTOR vverts[4] = {  { -0.5f, -0.5f, 0, 0 },
+							{  0.0f,  0.5f, 0, 0 },
+							{  0.5f, -0.5f, 0, 0 },
+							{  0.25f, 0.0f, 0, 0 }, };
+
+	for (XMVECTOR& vec : vverts)
+		vec = XMVector3Transform(vec, trfm);
+
+	XMFLOAT3 fverts[4];
+	for (usize i = 0; i < 4; i++)
+		XMStoreFloat3(fverts + i, vverts[i]);
+
+	for (u32 i = 0; i < 4; i++) {
+		auto color = triangle.colors[triangle.singleColor ? 0 : i];
+		vbuf.EmplaceBack(fverts[i], DirectX::XMFLOAT4{ color[0], color[1], color[2], color[3] });
+	}
+
+	indicies.resize(indicies.size() + 6);
+}

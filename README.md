@@ -9,8 +9,3 @@ If you change something and it doesn't do anything, try pressing F6 (to reload t
 
 Demo video:  
 [Open MIDI Visualizer (Alpha Demo)](https://youtu.be/4YJwQmvFq10)
-
-## Todo list
-
-- Why does reloading change depth spacing again?
-- Separate note height and depth
