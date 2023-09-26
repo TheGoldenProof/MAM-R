@@ -215,6 +215,14 @@ void TestScene::DrawGUI(Globe& gb) {
 					trackColors.insert(trackColors.begin() + i, trackColors[i]);
 					i++;
 				}
+				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
+				if (ImGui::Button(std::format("^##up{:d}", i).c_str(), buttonSize) && i != 0) {
+					trackColors[i].swap(trackColors[i-1]);
+				}
+				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
+				if (ImGui::Button(std::format("v##down{:d}", i).c_str(), buttonSize) && i != trackColors.size()-1) {
+					trackColors[i].swap(trackColors[i+1]);
+				}
 				ImGui::SameLine();
 				ImGui::ColorEdit3(std::format("Track {:d}", i + 1).c_str(), trackColors[i].data(), ImGuiColorEditFlags_NoInputs);
 			}
