@@ -6,6 +6,9 @@
 #include "Scene\Scene.h"
 
 class MidiScene : public Scene {
+private:
+	MIDI::RawMidi rawMidi;
+	bool midiPathChanged = false;
 protected:
 	bool needsReset = false;
 
@@ -35,6 +38,7 @@ protected:
 	bool clearBGImg = false;
 
 	f32 playX = 0.0f;
+	std::vector<std::pair<usize, bool>> trackReorder; // <index, enabled>
 public:
 	MidiScene(class Globe& gb, const std::string& name);
 

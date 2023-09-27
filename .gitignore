@@ -2,6 +2,7 @@ shaders/
 *.cso
 
 imgui.ini
+*.omvcfg
 
 # Prerequisites
 *.d

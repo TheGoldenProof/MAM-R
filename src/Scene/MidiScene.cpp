@@ -169,6 +169,27 @@ void MidiScene::DrawGUI(Globe& gb) {
 	if (ImGui::Begin("MIDI Controls")) {
 		ImGui::SetNextItemWidth(128.0f);
 		ImGui::InputInt("Offset (ms)", &midiOffset);
+		if (ImGui::TreeNode("Track order")) {
+			const f32 buttonDim = ImGui::GetFrameHeight();
+			const ImVec2 buttonSize(buttonDim, buttonDim);
+			for (u32 i = 0; i < midi.GetTracks().size(); i++) {
+				if (ImGui::Button(std::format("^##trRup{:d}", i).c_str(), buttonSize) && i != 0) {
+					std::swap(trackReorder[i], trackReorder[i-1]);
+					reloadMidi = true;
+				}
+				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
+				if (ImGui::Button(std::format("v##trRdown{:d}", i).c_str(), buttonSize) && i != trackReorder.size() - 1) {
+					std::swap(trackReorder[i], trackReorder[i+1]);
+					reloadMidi = true;
+				}
+				ImGui::SameLine();
+				if (ImGui::Checkbox(std::format("Track {:d}", trackReorder[i].first + 1).c_str(), &trackReorder[i].second)) {
+					reloadMidi = true;
+				}
+
+			}
+			ImGui::TreePop();
+		}
 	}
 	ImGui::End();
 
@@ -205,6 +226,7 @@ void MidiScene::DrawGUI(Globe& gb) {
 	if (bOpenMIDI) {
 		std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { {L"MIDI file", L"*.mid;*.midi"}, {L"All files", L"*.*"} };
 		midiPath = gb.Wnd().OpenFile(std::move(fileTypes), 1, L".mid");
+		midiPathChanged = true;
 		if (auto oCam = gb.Cams().GetActiveCamera(); oCam) oCam.value().get().Reset();
 		isPlaying = false;
 		reloadMidi = true;
@@ -272,9 +294,23 @@ void MidiScene::InitMidi(Globe& gb) {
 
 	if (midiPath.empty()) return;
 
-	MIDI::RawMidi rawMidi(gb, midiPath);
+	if (midiPathChanged) {
+		rawMidi.Open(gb, midiPath);
+		trackReorder.clear();
+		midiPathChanged = false;
+	}
 
 	midi.Cook(std::move(rawMidi));
+
+	const usize trackCount = midi.GetTracks().size();
+	if (trackReorder.size() > trackCount) {
+		trackReorder.resize(trackCount);
+	} else {
+		usize trackReorderSize = 0;
+		while ((trackReorderSize = trackReorder.size()) < trackCount) {
+			trackReorder.emplace_back(trackReorderSize, true);
+		}
+	}
 
 	InitVisuals(gb);
 
@@ -312,4 +348,6 @@ void MidiScene::WriteConfig(Globe& gb) {
 void MidiScene::ReadConfig(Globe& gb) {
 	Config& cfg = gb.Cfg();
 	cfg.Get("bgColor", gb.clearColor, _countof(gb.clearColor));
+
+	reloadMidi = true;
 }

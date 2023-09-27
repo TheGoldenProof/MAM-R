@@ -73,8 +73,12 @@ void TestScene::Draw(Globe& gb) {
 
 void TestScene::InitVisuals(Globe& gb) {
 	usize maxIndexCount = 0;
-	for (usize i = 0; i < midi.GetTracks().size(); i++) {
-		const MIDI::Track& track = midi.GetTracks()[i];
+	usize skippedTracks = 0;
+	for (usize fi = 0; fi < midi.GetTracks().size(); fi++) {
+		const auto& trR = trackReorder[fi];
+		if (!trR.second) { skippedTracks++; continue; }
+		const usize i = fi - skippedTracks;
+		const MIDI::Track& track = midi.GetTracks()[trR.first];
 		auto trackColor = trackColors[i % trackColors.size()];
 		const usize noteCount = std::min(0x7fffffff/24ull, track.notes.size());
 		if (noteCount == 0) continue;
@@ -191,7 +195,7 @@ void TestScene::DrawGUI(Globe& gb) {
 		if (ImGui::TreeNode("Note Options")) {
 			ImGui::PushItemWidth(128.0f);
 			ImGui::SliderFloat("Velocity Intensity", &velocityFactor, 0.0f, 1.0f);
-			ImGui::SliderInt("Note Sides", &noteType, 3, 4);
+			if (ImGui::SliderInt("Note Sides", &noteType, 3, 4)) reloadMidi = true;
 			ImGui::SliderAngle("Note Rotation", &noteRotation, -180.0f, 180.0f);
 			ImGui::InputFloat("Height", &noteHeight);
 			ImGui::InputFloat("Vertical Spacing", &noteVSpacing);
@@ -209,19 +213,23 @@ void TestScene::DrawGUI(Globe& gb) {
 				if (ImGui::Button(std::format("-##del{:d}", i).c_str(), buttonSize)) {
 					trackColors.erase(trackColors.begin() + i);
 					i--;
+					reloadMidi = true;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
-				if (ImGui::Button(std::format("+##add{:d}", i).c_str(), buttonSize)) {
+				if (ImGui::Button(std::format("+##trRadd{:d}", i).c_str(), buttonSize)) {
 					trackColors.insert(trackColors.begin() + i, trackColors[i]);
 					i++;
+					reloadMidi = true;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
-				if (ImGui::Button(std::format("^##up{:d}", i).c_str(), buttonSize) && i != 0) {
+				if (ImGui::Button(std::format("^##trRup{:d}", i).c_str(), buttonSize) && i != 0) {
 					trackColors[i].swap(trackColors[i-1]);
+					reloadMidi = true;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
-				if (ImGui::Button(std::format("v##down{:d}", i).c_str(), buttonSize) && i != trackColors.size()-1) {
+				if (ImGui::Button(std::format("v##trRdown{:d}", i).c_str(), buttonSize) && i != trackColors.size()-1) {
 					trackColors[i].swap(trackColors[i+1]);
+					reloadMidi = true;
 				}
 				ImGui::SameLine();
 				ImGui::ColorEdit3(std::format("Track {:d}", i + 1).c_str(), trackColors[i].data(), ImGuiColorEditFlags_NoInputs);
@@ -229,6 +237,7 @@ void TestScene::DrawGUI(Globe& gb) {
 
 			if (ImGui::Button("+##addEnd", buttonSize)) {
 				trackColors.push_back(trackColors.front());
+				reloadMidi = true;
 			}
 
 			ImGui::TreePop();
@@ -269,8 +278,10 @@ void TestScene::ReadConfig(Globe& gb) {
 	cfg.Get("ts.noteHeight", &noteHeight);
 	cfg.Get("ts.noteVSpacing", &noteVSpacing);
 	cfg.Get("ts.noteHSpacing", &noteHSpacing);
-	trackColors.resize(cfg()["ts.trackColors"].size() / (sizeof(f32) * 4));
-	cfg.Get("ts.trackColors", trackColors.data());
+	if (auto trackColorCount = cfg()["ts.trackColors"].size(); trackColorCount != 0) {
+		trackColors.resize(trackColorCount / (sizeof(f32) * 4));
+		cfg.Get("ts.trackColors", trackColors.data());
+	}
 
 	if (auto opCam = gb.Cams().GetCamera("Camera0"); opCam) {
 		Camera& cam = opCam.value().get();
