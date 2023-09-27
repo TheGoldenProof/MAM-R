@@ -6,6 +6,8 @@
 
 class Globe {
 	friend class App;
+public:
+	using DurType = std::chrono::steady_clock::duration;
 private:
 	class Window* pWnd = nullptr;
 	class Graphics* pGraphics = nullptr;
@@ -22,9 +24,9 @@ private:
 	u64 tickCount = 0;
 	u64 frameCount = 0;
 
-	f32 tickDt = 0;
+	DurType tickDt{ 0 };
 	f32 targetTPS = 0; 
-	f32 targetTdt = 0;
+	DurType targetTdt{ 0 };
 	f32 drawDt = 0;
 	f32 targetFPS = 0; // filled by vsync
 	f32 targetFdt = 0;
@@ -44,11 +46,29 @@ public:
 	u64 TickCount() const noexcept { return tickCount; }
 	u64 FrameCount() const noexcept { return frameCount; }
 
-	f32 RealTickDt() const noexcept { return tickDt; }
+	template<typename Rep = f32, typename Period = std::ratio<1>>
+	std::chrono::duration<Rep, Period> RealTickDt_dur() const noexcept { return std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(tickDt); }
+
+	template<typename Rep = f32, typename Period = std::ratio<1>>
+	Rep RealTickDt() const noexcept { return RealTickDt_dur<Rep, Period>().count(); }
+
 	f32 TargetTPS() const noexcept { return targetTPS; }
-	void TargetTPS(f32 target) noexcept { targetTPS = target; targetTdt = 1.0f / target; }
-	f32 TargetTickDt() const noexcept { return targetTdt; }
-	void TargetTickDt(f32 target) noexcept { targetTPS = 1.0f / target; targetTdt = target; }
+	void TargetTPS(f32 target) noexcept;
+
+	template<typename Rep = f32, typename Period = std::ratio<1>>
+	std::chrono::duration<Rep, Period> TargetTickDt_dur() const noexcept { return std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(targetTdt); }
+
+	template<typename Rep = f32, typename Period = std::ratio<1>>
+	Rep TargetTickDt() const noexcept { return TargetTickDt_dur<Rep, Period>().count(); }
+
+	template<typename Rep = f32, typename Period = std::ratio<1>>
+	void TargetTickDt(Rep target) noexcept {
+		const std::chrono::duration<Rep, Period> _dur(target);
+		targetTdt = std::chrono::duration_cast<DurType>(_dur);
+		targetTPS = 1.0f / std::chrono::duration_cast<std::chrono::seconds>(_dur);
+	}
+
+	
 
 	f32 RealFrameDt() const noexcept { return drawDt; }
 	f32 TargetFPS() const noexcept { return targetFPS; }

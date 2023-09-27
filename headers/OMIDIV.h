@@ -17,7 +17,7 @@ public:
 
 	i32 Run();
 private:
-	void Update(f32 dt);
+	void Update(std::chrono::steady_clock::duration dt);
 	void Draw(f32 dt);
 private:
 	Globe gb;

@@ -11,11 +11,12 @@ private:
 	bool midiPathChanged = false;
 protected:
 	bool needsReset = false;
+	u32 currentTick = 0;
+	u64 currentMilli = 0;
 
 	f32 lengthScale = 2.0f/3.0f;
 	std::wstring midiPath;
 	MIDI::CookedMidi midi;
-	u32 currentTick = 0;
 	u32 tempoMicros = 500000;
 	u32 tempoMapIndex = 0;
 	bool isPlaying = false;

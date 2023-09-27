@@ -102,7 +102,7 @@ i32 App::Run() {
         */
         if (updateTime_ >= gb.TargetTickDt()) {
             updateTime_ -= gb.TargetTickDt();
-            Update(updateTimer.Mark());
+            Update(updateTimer.Mark_dur<i64, std::nano>());
         }
 
         if (drawTimer.Peek() >= gb.TargetFrameDt()) {
@@ -112,11 +112,11 @@ i32 App::Run() {
     }
 }
 
-void App::Update(f32 dt) {
+void App::Update(std::chrono::steady_clock::duration dt) {
     gb.tickDt = dt;
     gb.tickCount++;
 
-    tpsArr[tpsI] = dt;
+    tpsArr[tpsI] = std::chrono::duration<f32>(dt).count();
     tpsI = (tpsI + 1) % tpsArr.size();
 
     sceneCtrl.Update(gb);
