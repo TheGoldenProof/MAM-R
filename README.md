@@ -16,3 +16,4 @@ Demo videos:
 - optionally disable auto-reloading midi in case of large midi files
 - ffmpeg export
 - other visualizations
+- Midis using SMPTE time divisions probably dont work

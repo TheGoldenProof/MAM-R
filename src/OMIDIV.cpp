@@ -147,11 +147,6 @@ void App::Draw(f32 dt) {
 
     gb.Cams().BindActive(gb.Gfx());
 
-    // Draw stuff here
-    sceneCtrl.Draw(gb);
-    //
-    frameCtrl.Execute(gb);
-
     //if (show_demo_window && gb.Gfx().IsImguiEnabled()) 
     //ImGui::ShowDemoWindow();
     if (gb.Gfx().IsImguiEnabled()) gb.Cams().SpawnWindowFor("Camera0");
@@ -165,7 +160,7 @@ void App::Draw(f32 dt) {
         ImGui::SetNextWindowSize({ nww, nwh });
         ImGui::SetNextWindowPos({ gb.Gfx().GetWidth() - nww, gb.Gfx().GetHeight() - nwh });
         if (ImGui::Begin("fps", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs)) {
-            ImGui::SetWindowFontScale(2.0f);
+            //ImGui::SetWindowFontScale(2.0f);
             ImGui::Text("%02.2f tps", 1.0f / avgTps);
             ImGui::Text("%02.2f fps", 1.0f / avgFps);
         }
@@ -176,12 +171,16 @@ void App::Draw(f32 dt) {
         ImGui::SetNextWindowSize({ nww, nwh });
         ImGui::SetNextWindowPos({ 0, 0 });
         if (ImGui::Begin("debug", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs)) {
-            ImGui::SetWindowFontScale(2.0f);
+            //ImGui::SetWindowFontScale(2.0f);
             ImGui::Text("draws: %d", gb.Gfx().drawCalls);
         }
         ImGui::End();
     }
-    
+
+    // Draw stuff here
+    sceneCtrl.Draw(gb);
+    //
+    frameCtrl.Execute(gb);
 
     gb.Gfx().EndFrame();
     gb.Kbd().Update();

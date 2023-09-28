@@ -3,6 +3,7 @@ shaders/
 
 imgui.ini
 *.omvcfg
+tests/
 
 # Prerequisites
 *.d

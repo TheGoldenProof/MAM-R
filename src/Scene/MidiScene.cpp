@@ -71,8 +71,9 @@ void MidiScene::Update(Globe& gb) {
 	UpdateTPS(gb);
 
 	if (midiOffset != midiOffsetPrev) {
-		const f32 diff = static_cast<f32>(midiOffset - midiOffsetPrev);
-		MovePlay(gb, MillisToPixels(diff));
+		const std::chrono::microseconds diff(1000 * (midiOffset - midiOffsetPrev));
+		MovePlay(gb, MicrosToPixels(currentTime.count(), diff.count()));
+		currentTime += diff;
 		midiOffsetPrev = midiOffset;
 	}
 
@@ -86,13 +87,14 @@ void MidiScene::Update(Globe& gb) {
 		dx = 1.0f;
 		break;
 	case MIDI::MIDI_DIVISION_FORMAT_SMPTE:
-		dx = (6e7f / tempoMicros) * gb.TargetTPS(); // no idea if this is right. it might just need to be noteScaleFactor as well.
+		dx = gb.TargetTickDt() / (-div.smpte * div.ticksPerFrame);
 		break;
 	}
 
 	MovePlay(gb, dx);
 
 	currentTick++;
+	currentTime += gb.TargetTickDt_dur<i64, std::micro>();
 }
 
 void MidiScene::Draw(Globe& gb) {
@@ -128,15 +130,23 @@ void MidiScene::Draw(Globe& gb) {
 void MidiScene::Reset(Globe& gb) {
 	if (auto opCam = gb.Cams().GetActiveCamera(); opCam) opCam.value().get().Reset();
 	playX = 0.0f;
+	currentTime = std::chrono::microseconds(1000 * midiOffset);
 	InitMidi(gb);
-	MovePlay(gb, MillisToPixels(static_cast<f32>(midiOffset)));
+	MovePlay(gb, MicrosToPixels(0, 1000 * midiOffset));
 	sound.Open(gb.Audio(), audioPath.c_str());
 	sound.SetVolume(volume);
 	sound.SetOffset(audioOffset);
 }
 
 void MidiScene::DrawGUI(Globe& gb) {
-	UNREFERENCED_PARAMETER(gb);
+	if (gb.Gfx().IsImDebugEnabled()) {
+		if (ImGui::Begin("debug")) {
+			ImGui::Text("time: %d", currentTime.count());
+			ImGui::Text("next tempo: %d", midi.GetTempoMap().next(currentTime.count()).first);
+		}
+		ImGui::End();
+	}
+
 	bool bOpenMIDI = false;
 	bool bOpenAudio = false;
 	bool bOpenImage = false;
@@ -272,24 +282,56 @@ void MidiScene::DrawGUI(Globe& gb) {
 	}
 }
 
-f32 MidiScene::MillisToPixels(f32 millis) const {
+f32 MidiScene::MicrosToPixels(i64 start, i64 micros) const {
 	f32 odx = 0;
-	const auto midiDiv = midi.GetHeader().division;
-	switch (midiDiv.fmt) {
-	case MIDI::MIDI_DIVISION_FORMAT_TPQN:
-		odx = millis * 1000.0f * midiDiv.ticksPerQuarter / (tempoMicros);
-		break;
-	case MIDI::MIDI_DIVISION_FORMAT_SMPTE:
-		odx = millis / (1000.0f * -midiDiv.smpte * midiDiv.ticksPerFrame);
-		break;
+	const auto& tempoMap = midi.GetTempoMap();
+
+	while (micros != 0) {
+		i64 timeSpentInTempo = 0;
+		u32 _tempo = tempoMap[start].second;
+
+		decltype(tempoMap._map)::const_iterator nextIt;
+		if (micros < 0) {
+			nextIt = tempoMap._map.lower_bound(start);
+			if (nextIt == tempoMap._map.begin()) {
+				timeSpentInTempo = micros;
+			} else {
+				nextIt--;
+				if (nextIt->first < (start + micros)) {
+					timeSpentInTempo = micros;
+				} else {
+					timeSpentInTempo = nextIt->first - start;
+				}
+			}
+			_tempo = nextIt->second;
+		} else {
+			nextIt = tempoMap._map.upper_bound(start);
+			if (nextIt == tempoMap._map.end() || nextIt->first > (start + micros)) {
+				timeSpentInTempo = micros;
+			} else {
+				timeSpentInTempo = nextIt->first - start;
+			}
+		}
+		start += timeSpentInTempo;
+		micros -= timeSpentInTempo;
+
+		const auto midiDiv = midi.GetHeader().division;
+		switch (midiDiv.fmt) {
+		case MIDI::MIDI_DIVISION_FORMAT_TPQN:
+			odx += timeSpentInTempo * midiDiv.ticksPerQuarter / (_tempo);
+			break;
+		case MIDI::MIDI_DIVISION_FORMAT_SMPTE:
+			odx += timeSpentInTempo / (1e6f * -midiDiv.smpte * midiDiv.ticksPerFrame);
+			break;
+		}
 	}
+
 	return odx;
 }
 
 void MidiScene::InitMidi(Globe& gb) {
 	currentTick = 0;
-	tempoMicros = 500000;
-	tempoMapIndex = 0;
+	currentTempo = 500000;
 	ClearVisuals(gb);
 
 	if (midiPath.empty()) return;
@@ -312,30 +354,24 @@ void MidiScene::InitMidi(Globe& gb) {
 		}
 	}
 
-	InitVisuals(gb);
-
 	UpdateTPS(gb);
+
+	InitVisuals(gb);
 }
 
 void MidiScene::UpdateTPS(Globe& gb) {
-	const auto& tempoMap = midi.GetTempoMap();
-	if (tempoMapIndex >= tempoMap.size()) return;
-
-	if (const auto p = midi.GetTempoMap()[tempoMapIndex]; currentTick == p.first) {
-		if (tempoMicros == p.second) return;
-		tempoMicros = p.second;
+	if (const auto newTempo = midi.GetTempoMap()[currentTime.count()].second; currentTempo != newTempo) {
+		currentTempo = newTempo;
 
 		auto div = midi.GetHeader().division;
 		switch (div.fmt) {
 		case MIDI::MIDI_DIVISION_FORMAT_TPQN:
-			gb.TargetTPS((1e6f / tempoMicros) * div.ticksPerQuarter);
+			gb.TargetTickDt<u32, std::micro>(currentTempo / div.ticksPerQuarter);
 			break;
 		case MIDI::MIDI_DIVISION_FORMAT_SMPTE:
 			gb.TargetTPS(-div.smpte * static_cast<f32>(div.ticksPerFrame));
 			break;
 		}
-
-		tempoMapIndex++;
 	}
 
 }

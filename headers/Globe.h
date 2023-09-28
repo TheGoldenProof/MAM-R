@@ -65,10 +65,8 @@ public:
 	void TargetTickDt(Rep target) noexcept {
 		const std::chrono::duration<Rep, Period> _dur(target);
 		targetTdt = std::chrono::duration_cast<DurType>(_dur);
-		targetTPS = 1.0f / std::chrono::duration_cast<std::chrono::seconds>(_dur);
+		targetTPS = 1.0f / std::chrono::duration_cast<std::chrono::seconds>(_dur).count();
 	}
-
-	
 
 	f32 RealFrameDt() const noexcept { return drawDt; }
 	f32 TargetFPS() const noexcept { return targetFPS; }

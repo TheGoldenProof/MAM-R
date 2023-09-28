@@ -13,6 +13,7 @@ RawMidi::RawMidi(Globe& gb, const std::wstring& path) {
 }
 
 void RawMidi::Open(Globe& gb, const std::wstring& path) {
+	tracks.clear();
 	std::ifstream file(path, std::ios::binary);
 	if (!file.is_open()) {
 		MessageBox(gb.Wnd().GetHWND(), L"Couldn't open file.", nullptr, MB_OK | MB_ICONERROR);

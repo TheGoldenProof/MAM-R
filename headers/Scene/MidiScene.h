@@ -4,6 +4,7 @@
 #include "MIDI\CookedMidi.h"
 #include "miniaudio\Sound.h"
 #include "Scene\Scene.h"
+#include <chrono>
 
 class MidiScene : public Scene {
 private:
@@ -12,13 +13,12 @@ private:
 protected:
 	bool needsReset = false;
 	u32 currentTick = 0;
-	u64 currentMilli = 0;
+	std::chrono::microseconds currentTime{ 0 };
+	u32 currentTempo = 500000;
 
 	f32 lengthScale = 2.0f/3.0f;
 	std::wstring midiPath;
 	MIDI::CookedMidi midi;
-	u32 tempoMicros = 500000;
-	u32 tempoMapIndex = 0;
 	bool isPlaying = false;
 	bool reloadMidi = false;
 	i32 midiOffset = 0;
@@ -55,7 +55,7 @@ protected:
 	virtual void DrawGUI(class Globe& gb);
 	virtual void WriteConfig(Globe& gb);
 	virtual void ReadConfig(Globe& gb);
-	f32 MillisToPixels(f32 millis) const;
+	f32 MicrosToPixels(i64 start, i64 micros) const;
 private:
 	void InitMidi(class Globe& gb);
 	void UpdateTPS(class Globe& gb);

@@ -1,6 +1,6 @@
 #pragma once
 #include "MIDI\RawMidi.h"
-#include <array>
+#include <chrono>
 #include <map>
 #include <vector>
 
@@ -17,15 +17,24 @@ struct Note {
 };
 
 struct Track {
-	//std::array<std::vector<Note>, 16> notes;
 	std::vector<Note> notes;
 };
 
 class CookedMidi {
+public:
+	class TempoMap {
+		friend CookedMidi;
+	public:
+		TempoMap();
+		std::map<i64, u32> _map; // <time micros, tempo micros>
+		std::pair<i64, u32> operator[](i64 timeMicros) const;
+		std::map<i64, u32>::const_iterator GetIt(i64 timeMicros) const;
+		std::pair<i64, u32> next(i64 timeMicros) const;
+	};
 private:
 	HeaderChunk header;
 	std::vector<Track> tracks;
-	std::vector<std::pair<u32, u32>> tempoMap; // <tick, tempo micros>
+	TempoMap tempoMap;
 public:
 	CookedMidi();
 	CookedMidi(const RawMidi& raw);
@@ -34,7 +43,10 @@ public:
 
 	const HeaderChunk& GetHeader() const noexcept { return header; }
 	const std::vector<Track>& GetTracks() const noexcept { return tracks; }
-	const std::vector<std::pair<u32, u32>> GetTempoMap() const noexcept { return tempoMap; }
+	const TempoMap& GetTempoMap() const noexcept { return tempoMap; }
+private:
+	void CookTempoMap(const RawMidi& raw);
+	//void CookNotes(const RawMidi& raw);
 };
 
 }
