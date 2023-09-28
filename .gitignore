@@ -401,3 +401,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+!/ThirdParty/DXTex/bin/
+!/ThirdParty/DXTex/bin/*
+!/ThirdParty/DXTex/bin/**/*
