@@ -17,3 +17,4 @@ Demo videos:
 - ffmpeg export
 - other visualizations
 - Midis using SMPTE time divisions probably dont work
+- Update notifier using GitHub API
