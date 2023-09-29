@@ -18,6 +18,7 @@ struct Note {
 
 struct Track {
 	std::vector<Note> notes;
+	std::string name;
 };
 
 class CookedMidi {

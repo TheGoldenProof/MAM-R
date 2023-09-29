@@ -12,6 +12,7 @@ private:
 	bool midiPathChanged = false;
 protected:
 	bool needsReset = false;
+	bool needsRestart = false;
 	u32 currentTick = 0;
 	std::chrono::microseconds currentTime{ 0 };
 	u32 currentTempo = 500000;

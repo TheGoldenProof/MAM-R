@@ -93,7 +93,7 @@ void MidiScene::Update(Globe& gb) {
 
 	MovePlay(gb, dx);
 
-	currentTick++;
+	if (currentTime.count() >= 0) currentTick++;
 	currentTime += gb.TargetTickDt_dur<i64, std::micro>();
 }
 
@@ -193,7 +193,10 @@ void MidiScene::DrawGUI(Globe& gb) {
 					reloadMidi = true;
 				}
 				ImGui::SameLine();
-				if (ImGui::Checkbox(std::format("Track {:d}", trackReorder[i].first + 1).c_str(), &trackReorder[i].second)) {
+				usize trackIndex = trackReorder[i].first;
+				const std::string& trackName = midi.GetTracks()[trackIndex].name;
+				std::string trackDisplyName = trackName.empty() ? std::format("Track {:d}", trackIndex + 1) : trackName;
+				if (ImGui::Checkbox(std::format("{:s}##track{:d}", std::move(trackDisplyName), trackIndex).c_str(), &trackReorder[i].second)) {
 					reloadMidi = true;
 				}
 

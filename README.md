@@ -11,7 +11,6 @@ Demo videos:
 [Open MIDI Visualizer (Alpha Demo)](https://youtu.be/4YJwQmvFq10)
 
 ## What's Next / To Do
-- Add track name (from midi info) to track color/order display
 - figure out how to auto-reload the midi for quickly changing values (sliders, input)
 - optionally disable auto-reloading midi in case of large midi files
 - ffmpeg export

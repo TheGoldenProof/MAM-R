@@ -62,6 +62,10 @@ void CookedMidi::Cook(const RawMidi& raw) {
 
 			const u8 eventType = pEvent->GetEventType();
 			if (eventType == 0xff) {
+				const MetaEvent* pMetaEvent = reinterpret_cast<const MetaEvent*>(pEvent.get());
+				if (pMetaEvent->type == MIDI_META_EVENT_TRACK_NAME) {
+					track.name = std::string(reinterpret_cast<char*>(pMetaEvent->data), pMetaEvent->length);
+				}
 			} else {
 				if (eventType >> 4 == MIDI_EVENT_STATUS_NOTE_ON) {
 					const NoteEvent* pNoteEvent = reinterpret_cast<const NoteEvent*>(pEvent.get());

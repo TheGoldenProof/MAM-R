@@ -232,7 +232,10 @@ void TestScene::DrawGUI(Globe& gb) {
 					reloadMidi = true;
 				}
 				ImGui::SameLine();
-				ImGui::ColorEdit3(std::format("Track {:d}", i + 1).c_str(), trackColors[i].data(), ImGuiColorEditFlags_NoInputs);
+				usize trackIndex = i < midi.GetTracks().size() ? trackReorder[i].first : i;
+				std::string trackName = trackIndex < midi.GetTracks().size() ? midi.GetTracks()[trackIndex].name : "";
+				std::string trackDisplayName = trackName.empty() ? std::format("Track {:d}", trackIndex + 1) : trackName;
+				ImGui::ColorEdit3(std::format("{:s}##track{:d}", trackDisplayName, trackIndex).c_str(), trackColors[i].data(), ImGuiColorEditFlags_NoInputs);
 			}
 
 			if (ImGui::Button("+##addEnd", buttonSize)) {
