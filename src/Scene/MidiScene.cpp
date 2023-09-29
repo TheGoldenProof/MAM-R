@@ -34,9 +34,12 @@ void MidiScene::Update(Globe& gb) {
 		Restart(gb);
 		needsRestart = false;
 	}
-	if (reloadMidi) {
+	if (reloadMidi || (autoReload && 
+			lastValueChange != std::chrono::steady_clock::time_point::max() && 
+			std::chrono::steady_clock::now() - lastValueChange > std::chrono::nanoseconds(500'000'000))) {
 		InitMidi(gb);
 		reloadMidi = false;
+		lastValueChange = std::chrono::steady_clock::time_point::max();
 	}
 
 	if (reloadAudio) {
@@ -192,7 +195,7 @@ void MidiScene::DrawGUI(Globe& gb) {
 
 	if (ImGui::Begin("MIDI Controls")) {
 		ImGui::SetNextItemWidth(128.0f);
-		ImGui::InputInt("Offset (ms)", &midiOffset);
+		if (ImGui::InputInt("Offset (ms)", &midiOffset)) lastValueChange = std::chrono::steady_clock::now();
 		if (ImGui::TreeNode("Track order")) {
 			const f32 buttonDim = ImGui::GetFrameHeight();
 			const ImVec2 buttonSize(buttonDim, buttonDim);
@@ -221,7 +224,7 @@ void MidiScene::DrawGUI(Globe& gb) {
 	ImGui::End();
 
 	if (ImGui::Begin("Misc Controls")) {
-		ImGui::Checkbox("Auto-reload MIDI", &autoReload);
+		ImGui::Checkbox("Auto-apply certain changes", &autoReload);
 		ImGui::ColorEdit3("Background Color", gb.clearColor, ImGuiColorEditFlags_NoInputs);
 		ImGui::Text("Background Image"); ImGui::SameLine();
 		bOpenImage = ImGui::Button("Open##bgImg"); ImGui::SameLine();

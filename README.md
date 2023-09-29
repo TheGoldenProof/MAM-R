@@ -11,7 +11,6 @@ Demo videos:
 [Open MIDI Visualizer (Alpha Demo)](https://youtu.be/4YJwQmvFq10)
 
 ## What's Next / To Do
-- figure out how to auto-reload the midi for quickly changing values (sliders, input)
 - ffmpeg export
 - other visualizations
 - Midis using SMPTE time divisions probably dont work

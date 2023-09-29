@@ -130,6 +130,7 @@ void TestScene::InitVisuals(Globe& gb) {
 				// Right
 				endD.position.x = note.startTick * lengthScale + noteLength;
 				endD.rotation.y = -Math::HALF_PI;
+				endD.rotation.z = -noteRotation;
 				pQbatch->AddOneQuad(endD);
 
 			} else if (noteType == 3) {
@@ -144,6 +145,7 @@ void TestScene::InitVisuals(Globe& gb) {
 				// Right
 				endD.position.x = note.startTick * lengthScale + noteLength;
 				endD.rotation.y = -Math::HALF_PI;
+				endD.rotation.z = -noteRotation;
 				pQbatch->AddOneTriangle(endD);
 			}
 
@@ -181,6 +183,8 @@ void TestScene::MovePlay(Globe& gb, f32 dx) {
 }
 
 void TestScene::DrawGUI(Globe& gb) {
+#define VALTM(statement) if (statement) lastValueChange = std::chrono::steady_clock::now()
+
 	MidiScene::DrawGUI(gb);
 	if (ImGui::Begin("Keybinds")) {
 		ImGui::Text("W/A/S/D/E/Q: Camera Position");
@@ -194,13 +198,13 @@ void TestScene::DrawGUI(Globe& gb) {
 		
 		if (ImGui::TreeNode("Note Options")) {
 			ImGui::PushItemWidth(128.0f);
-			ImGui::SliderFloat("Velocity Intensity", &velocityFactor, 0.0f, 1.0f);
-			if (ImGui::SliderInt("Note Sides", &noteType, 3, 4)) reloadMidi = true;
-			ImGui::SliderAngle("Note Rotation", &noteRotation, -180.0f, 180.0f);
-			ImGui::InputFloat("Height", &noteHeight);
-			ImGui::InputFloat("Vertical Spacing", &noteVSpacing);
-			ImGui::InputFloat("Length Factor", &lengthScale);
-			ImGui::InputFloat("Horizontal Spacing", &noteHSpacing);
+			VALTM(ImGui::SliderFloat("Velocity Intensity", &velocityFactor, 0.0f, 1.0f));
+			if (ImGui::SliderInt("Note Sides", &noteType, 3, 4)) reloadMidi = autoReload;
+			VALTM(ImGui::SliderAngle("Note Rotation", &noteRotation, -180.0f, 180.0f));
+			VALTM(ImGui::InputFloat("Height", &noteHeight));
+			VALTM(ImGui::InputFloat("Vertical Spacing", &noteVSpacing));
+			VALTM(ImGui::InputFloat("Length Factor", &lengthScale));
+			VALTM(ImGui::InputFloat("Horizontal Spacing", &noteHSpacing));
 			ImGui::PopItemWidth();
 
 			ImGui::TreePop();
@@ -235,7 +239,7 @@ void TestScene::DrawGUI(Globe& gb) {
 				usize trackIndex = i < midi.GetTracks().size() ? trackReorder[i].first : i;
 				std::string trackName = trackIndex < midi.GetTracks().size() ? midi.GetTracks()[trackIndex].name : "";
 				std::string trackDisplayName = trackName.empty() ? std::format("Track {:d}", trackIndex + 1) : trackName;
-				ImGui::ColorEdit3(std::format("{:s}##track{:d}", trackDisplayName, trackIndex).c_str(), trackColors[i].data(), ImGuiColorEditFlags_NoInputs);
+				VALTM(ImGui::ColorEdit3(std::format("{:s}##track{:d}", trackDisplayName, trackIndex).c_str(), trackColors[i].data(), ImGuiColorEditFlags_NoInputs));
 			}
 
 			if (ImGui::Button("+##addEnd", buttonSize)) {
@@ -248,6 +252,8 @@ void TestScene::DrawGUI(Globe& gb) {
 
 	}
 	ImGui::End();
+
+#undef VALTM
 }
 
 void TestScene::WriteConfig(Globe& gb) {

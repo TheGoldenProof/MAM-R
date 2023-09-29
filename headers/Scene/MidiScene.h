@@ -14,6 +14,8 @@ protected:
 	bool autoReload = true;
 	bool needsReset = false;
 	bool needsRestart = false;
+	std::chrono::steady_clock::time_point lastValueChange;
+
 	u32 currentTick = 0;
 	std::chrono::microseconds currentTime{ 0 };
 	u32 currentTempo = 500000;
