@@ -27,7 +27,12 @@ void MidiScene::Update(Globe& gb) {
 		Reset(gb);
 		reloadMidi = false;
 		reloadAudio = false;
+		needsRestart = false;
 		needsReset = false;
+	}
+	if (needsRestart) {
+		Restart(gb);
+		needsRestart = false;
 	}
 	if (reloadMidi) {
 		InitMidi(gb);
@@ -116,7 +121,12 @@ void MidiScene::Draw(Globe& gb) {
 			}
 		}
 	}
-
+	
+	if (gb.Kbd().KeyPressed('R')) {
+		isPlaying = false;
+		sound.Stop();
+		needsRestart = true;
+	}
 	if (gb.Kbd().KeyPressed(VK_F5)) {
 		isPlaying = false;
 		sound.Stop();
@@ -127,15 +137,19 @@ void MidiScene::Draw(Globe& gb) {
 	}
 }
 
-void MidiScene::Reset(Globe& gb) {
+void MidiScene::Restart(Globe& gb) {
 	if (auto opCam = gb.Cams().GetActiveCamera(); opCam) opCam.value().get().Reset();
 	playX = 0.0f;
 	currentTime = std::chrono::microseconds(1000 * midiOffset);
-	InitMidi(gb);
 	MovePlay(gb, MicrosToPixels(0, 1000 * midiOffset));
+	sound.SetOffset(audioOffset);
+}
+
+void MidiScene::Reset(Globe& gb) {
+	InitMidi(gb);
 	sound.Open(gb.Audio(), audioPath.c_str());
 	sound.SetVolume(volume);
-	sound.SetOffset(audioOffset);
+	Restart(gb);
 }
 
 void MidiScene::DrawGUI(Globe& gb) {
@@ -185,19 +199,19 @@ void MidiScene::DrawGUI(Globe& gb) {
 			for (u32 i = 0; i < midi.GetTracks().size(); i++) {
 				if (ImGui::Button(std::format("^##trRup{:d}", i).c_str(), buttonSize) && i != 0) {
 					std::swap(trackReorder[i], trackReorder[i-1]);
-					reloadMidi = true;
+					reloadMidi = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("v##trRdown{:d}", i).c_str(), buttonSize) && i != trackReorder.size() - 1) {
 					std::swap(trackReorder[i], trackReorder[i+1]);
-					reloadMidi = true;
+					reloadMidi = autoReload;
 				}
 				ImGui::SameLine();
 				usize trackIndex = trackReorder[i].first;
 				const std::string& trackName = midi.GetTracks()[trackIndex].name;
 				std::string trackDisplyName = trackName.empty() ? std::format("Track {:d}", trackIndex + 1) : trackName;
 				if (ImGui::Checkbox(std::format("{:s}##track{:d}", std::move(trackDisplyName), trackIndex).c_str(), &trackReorder[i].second)) {
-					reloadMidi = true;
+					reloadMidi = autoReload;
 				}
 
 			}
@@ -207,6 +221,7 @@ void MidiScene::DrawGUI(Globe& gb) {
 	ImGui::End();
 
 	if (ImGui::Begin("Misc Controls")) {
+		ImGui::Checkbox("Auto-reload MIDI", &autoReload);
 		ImGui::ColorEdit3("Background Color", gb.clearColor, ImGuiColorEditFlags_NoInputs);
 		ImGui::Text("Background Image"); ImGui::SameLine();
 		bOpenImage = ImGui::Button("Open##bgImg"); ImGui::SameLine();
@@ -228,9 +243,10 @@ void MidiScene::DrawGUI(Globe& gb) {
 
 	if (ImGui::Begin("Keybinds")) {
 		ImGui::Text("Space: Play/Pause");
+		ImGui::Text("R: Restart");
 		ImGui::Text("F1: Toggle GUI");
 		ImGui::Text("F3: Toggle debug info");
-		ImGui::Text("F5: Reset");
+		ImGui::Text("F5: Reload Everything");
 		ImGui::Text("F6: Refresh MIDI");
 		ImGui::Text("F11: Toggle Fullscreen");
 	}
@@ -240,9 +256,9 @@ void MidiScene::DrawGUI(Globe& gb) {
 		std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { {L"MIDI file", L"*.mid;*.midi"}, {L"All files", L"*.*"} };
 		midiPath = gb.Wnd().OpenFile(std::move(fileTypes), 1, L".mid");
 		midiPathChanged = true;
-		if (auto oCam = gb.Cams().GetActiveCamera(); oCam) oCam.value().get().Reset();
 		isPlaying = false;
 		reloadMidi = true;
+		needsRestart = true;
 	}
 
 	if (bOpenAudio) {
@@ -252,9 +268,9 @@ void MidiScene::DrawGUI(Globe& gb) {
 		};
 		audioPath = gb.Wnd().OpenFile(fileTypes, 1, L".mp3");
 		sound.Open(gb.Audio(), audioPath.c_str());
-		if (auto oCam = gb.Cams().GetActiveCamera(); oCam) oCam.value().get().Reset();
 		isPlaying = false;
 		reloadAudio = true;
+		needsRestart = true;
 	}
 
 	if (bOpenImage) {
@@ -388,5 +404,5 @@ void MidiScene::ReadConfig(Globe& gb) {
 	Config& cfg = gb.Cfg();
 	cfg.Get("bgColor", gb.clearColor, _countof(gb.clearColor));
 
-	reloadMidi = true;
+	reloadMidi = autoReload;
 }

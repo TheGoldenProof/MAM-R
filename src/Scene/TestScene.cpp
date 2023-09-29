@@ -213,23 +213,23 @@ void TestScene::DrawGUI(Globe& gb) {
 				if (ImGui::Button(std::format("-##del{:d}", i).c_str(), buttonSize)) {
 					trackColors.erase(trackColors.begin() + i);
 					i--;
-					reloadMidi = true;
+					reloadMidi = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("+##trRadd{:d}", i).c_str(), buttonSize)) {
 					trackColors.insert(trackColors.begin() + i, trackColors[i]);
 					i++;
-					reloadMidi = true;
+					reloadMidi = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("^##trRup{:d}", i).c_str(), buttonSize) && i != 0) {
 					trackColors[i].swap(trackColors[i-1]);
-					reloadMidi = true;
+					reloadMidi = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("v##trRdown{:d}", i).c_str(), buttonSize) && i != trackColors.size()-1) {
 					trackColors[i].swap(trackColors[i+1]);
-					reloadMidi = true;
+					reloadMidi = autoReload;
 				}
 				ImGui::SameLine();
 				usize trackIndex = i < midi.GetTracks().size() ? trackReorder[i].first : i;
@@ -240,7 +240,7 @@ void TestScene::DrawGUI(Globe& gb) {
 
 			if (ImGui::Button("+##addEnd", buttonSize)) {
 				trackColors.push_back(trackColors.front());
-				reloadMidi = true;
+				reloadMidi = autoReload;
 			}
 
 			ImGui::TreePop();

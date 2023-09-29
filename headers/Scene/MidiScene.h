@@ -11,6 +11,7 @@ private:
 	MIDI::RawMidi rawMidi;
 	bool midiPathChanged = false;
 protected:
+	bool autoReload = true;
 	bool needsReset = false;
 	bool needsRestart = false;
 	u32 currentTick = 0;
@@ -48,6 +49,7 @@ public:
 	virtual void Update(Globe& gb) override;
 	virtual void Draw(Globe& gb) override;
 
+	virtual void Restart(Globe& gb);
 	virtual void Reset(Globe& gb);
 protected:
 	virtual void InitVisuals(Globe& gb) = 0;

@@ -12,7 +12,6 @@ Demo videos:
 
 ## What's Next / To Do
 - figure out how to auto-reload the midi for quickly changing values (sliders, input)
-- optionally disable auto-reloading midi in case of large midi files
 - ffmpeg export
 - other visualizations
 - Midis using SMPTE time divisions probably dont work
