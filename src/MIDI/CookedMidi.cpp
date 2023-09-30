@@ -70,6 +70,8 @@ void CookedMidi::Cook(const RawMidi& raw) {
 				if (eventType >> 4 == MIDI_EVENT_STATUS_NOTE_ON) {
 					const NoteEvent* pNoteEvent = reinterpret_cast<const NoteEvent*>(pEvent.get());
 					if (pNoteEvent->vel() == 0) goto label_note_off;
+					track.highestNote = std::max(track.highestNote, pNoteEvent->key());
+					track.lowestNote = std::min(track.lowestNote, pNoteEvent->key());
 					std::map<u32, Note>& chActive = activeNotes[pNoteEvent->Channel()];
 					if (auto it = chActive.find(pNoteEvent->key()); it != chActive.end()) {
 						Note& oldNote = it->second;

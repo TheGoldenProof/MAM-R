@@ -11,9 +11,14 @@ private:
 	MIDI::RawMidi rawMidi;
 	bool midiPathChanged = false;
 protected:
+	bool isPlaying = false;
+
 	bool autoReload = true;
 	bool needsReset = false;
 	bool needsRestart = false;
+	bool reloadMidi = false;
+	bool reloadVisuals = false;
+	bool reloadAudio = false;
 	std::chrono::steady_clock::time_point lastValueChange;
 
 	u32 currentTick = 0;
@@ -23,14 +28,11 @@ protected:
 	f32 lengthScale = 2.0f/3.0f;
 	std::wstring midiPath;
 	MIDI::CookedMidi midi;
-	bool isPlaying = false;
-	bool reloadMidi = false;
 	i32 midiOffset = 0;
 	i32 midiOffsetPrev = 0;
 
 	std::wstring audioPath;
 	Sound sound;
-	bool reloadAudio = false;
 	f32 volume = 1.0f;
 	f32 volumePrev = 1.0f;
 	i32 audioOffset = 0;

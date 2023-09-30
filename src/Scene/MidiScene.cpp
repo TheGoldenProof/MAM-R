@@ -34,11 +34,17 @@ void MidiScene::Update(Globe& gb) {
 		Restart(gb);
 		needsRestart = false;
 	}
-	if (reloadMidi || (autoReload && 
-			lastValueChange != std::chrono::steady_clock::time_point::max() && 
-			std::chrono::steady_clock::now() - lastValueChange > std::chrono::nanoseconds(500'000'000))) {
+	if (reloadMidi) {
 		InitMidi(gb);
 		reloadMidi = false;
+		lastValueChange = std::chrono::steady_clock::time_point::max();
+	}
+	if (reloadVisuals || (autoReload && 
+			lastValueChange != std::chrono::steady_clock::time_point::max() && 
+			std::chrono::steady_clock::now() - lastValueChange > std::chrono::nanoseconds(500'000'000))) {
+		ClearVisuals(gb);
+		InitVisuals(gb);
+		reloadVisuals = false;
 		lastValueChange = std::chrono::steady_clock::time_point::max();
 	}
 
@@ -136,7 +142,10 @@ void MidiScene::Draw(Globe& gb) {
 		needsReset = true;
 	}
 	if (gb.Kbd().KeyPressed(VK_F6)) {
-		reloadMidi = true;
+		if (gb.Kbd().KeyIsPressed(VK_SHIFT)) {
+			reloadMidi = true;
+		} else 
+			reloadVisuals = true;
 	}
 }
 
