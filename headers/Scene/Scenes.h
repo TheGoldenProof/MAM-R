@@ -1,2 +1,2 @@
 #pragma once
-#include "TestScene.h"
+#include "Standard3D.h"

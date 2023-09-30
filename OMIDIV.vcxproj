@@ -209,7 +209,7 @@
     <ClInclude Include="headers\Scene\Scene.h" />
     <ClInclude Include="headers\Scene\SceneController.h" />
     <ClInclude Include="headers\Scene\Scenes.h" />
-    <ClInclude Include="headers\Scene\TestScene.h" />
+    <ClInclude Include="headers\Scene\Standard3D.h" />
     <ClInclude Include="headers\Util\DXUtil.h" />
     <ClInclude Include="headers\Util\Interp.h" />
     <ClInclude Include="headers\Util\Misc.h" />
@@ -297,7 +297,7 @@
     <ClCompile Include="src\Scene\MidiScene.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneController.cpp" />
-    <ClCompile Include="src\Scene\TestScene.cpp" />
+    <ClCompile Include="src\Scene\Standard3D.cpp" />
     <ClCompile Include="src\Util\DXUtil.cpp" />
     <ClCompile Include="src\Util\Interp.cpp" />
     <ClCompile Include="src\Windows\Callbacks\Misc.cpp" />

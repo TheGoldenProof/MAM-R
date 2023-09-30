@@ -4,7 +4,7 @@
 #include <array>
 #include <vector>
 
-class TestScene : public MidiScene {
+class Standard3D : public MidiScene {
 private:
 	std::unique_ptr<PixelConstantBufferCaching> pPlayPlanePBuf;
 	std::vector<std::unique_ptr<class QuadBatchColored>> trackVisuals;
@@ -19,7 +19,7 @@ private:
 	f32 noteHSpacing = 2.0f;
 	std::vector<std::array<f32, 4>> trackColors;
 public:
-	TestScene(class Globe& gb);
+	Standard3D(class Globe& gb, const std::string& name = "Standard3D");
 protected:
 	virtual void Draw(Globe& gb) override;
 	virtual void InitVisuals(Globe& gb) override;

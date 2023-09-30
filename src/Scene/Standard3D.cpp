@@ -4,14 +4,14 @@
 #include "Graphics\Drawable\Drawables.h"
 #include "imgui\imgui.h"
 #include "MIDI\RawMidi.h"
-#include "Scene\TestScene.h"
+#include "Scene\Standard3D.h"
 #include "Util\MyMath.h"
 #include "Windows\Keyboard.h"
 #include "Windows\Mouse.h"
 #include <cmath>
 #include <format>
 
-TestScene::TestScene(Globe& gb) : MidiScene(gb, "testScene0") {
+Standard3D::Standard3D(Globe& gb, const std::string& name) : MidiScene(gb, name) {
 	if (auto opCam = gb.Cams().GetCamera("Camera0"); opCam) {
 		opCam.value().get().SetHomePos({ 0, 0, -960.0f });
 		opCam.value().get().Reset();
@@ -49,7 +49,7 @@ TestScene::TestScene(Globe& gb) : MidiScene(gb, "testScene0") {
 	};
 }
 
-void TestScene::Draw(Globe& gb) {
+void Standard3D::Draw(Globe& gb) {
 	pPlayPlanePBuf->GetBuffer()["planeX"] = playX;
 	pPlayPlanePBuf->Bind(gb.Gfx());
 
@@ -71,7 +71,7 @@ void TestScene::Draw(Globe& gb) {
 	UpdateInputs(gb);
 }
 
-void TestScene::InitVisuals(Globe& gb) {
+void Standard3D::InitVisuals(Globe& gb) {
 	usize maxIndexCount = 0;
 	usize skippedTracks = 0;
 	for (usize fi = 0; fi < midi.GetTracks().size(); fi++) {
@@ -162,12 +162,12 @@ void TestScene::InitVisuals(Globe& gb) {
 	DEBUG_LOG(std::format("Max index count: {:d}\n", maxIndexCount).c_str());
 }
 
-void TestScene::ClearVisuals(Globe& gb) {
+void Standard3D::ClearVisuals(Globe& gb) {
 	UNREFERENCED_PARAMETER(gb);
 	trackVisuals.clear();
 }
 
-void TestScene::MovePlay(Globe& gb, f32 dx) {
+void Standard3D::MovePlay(Globe& gb, f32 dx) {
 	dx *= lengthScale;
 	//auto plPos = pPlayLine->GetPos();
 	//plPos.x += dx;
@@ -182,7 +182,7 @@ void TestScene::MovePlay(Globe& gb, f32 dx) {
 	}
 }
 
-void TestScene::DrawGUI(Globe& gb) {
+void Standard3D::DrawGUI(Globe& gb) {
 #define VALTM(statement) if (statement) lastValueChange = std::chrono::steady_clock::now()
 
 	MidiScene::DrawGUI(gb);
@@ -256,7 +256,7 @@ void TestScene::DrawGUI(Globe& gb) {
 #undef VALTM
 }
 
-void TestScene::WriteConfig(Globe& gb) {
+void Standard3D::WriteConfig(Globe& gb) {
 	MidiScene::WriteConfig(gb);
 
 	Config& cfg = gb.Cfg();
@@ -276,7 +276,7 @@ void TestScene::WriteConfig(Globe& gb) {
 	}
 }
 
-void TestScene::ReadConfig(Globe& gb) {
+void Standard3D::ReadConfig(Globe& gb) {
 	MidiScene::ReadConfig(gb);
 
 	Config& cfg = gb.Cfg();
@@ -304,7 +304,7 @@ void TestScene::ReadConfig(Globe& gb) {
 	}
 }
 
-void TestScene::UpdateInputs(Globe& gb) {
+void Standard3D::UpdateInputs(Globe& gb) {
 	const f32 speed = 300.0f * gb.TargetFrameDt();
 	DirectX::XMFLOAT3 ds = { 0, 0, 0 };
 	const f32 rotSpeed = Math::to_rad(60.0f) * gb.TargetFrameDt();

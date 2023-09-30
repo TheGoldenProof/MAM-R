@@ -141,7 +141,7 @@
     <ClInclude Include="headers\Scene\SceneController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\Scene\TestScene.h">
+    <ClInclude Include="headers\Scene\Standard3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\Util\DXUtil.h">
@@ -443,7 +443,7 @@
     <ClCompile Include="ThirdParty\TGLib\TGLib_Util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\TestScene.cpp">
+    <ClCompile Include="src\Scene\Standard3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MIDI\RawMidi.cpp">
