@@ -1,5 +1,6 @@
 shaders/
 *.cso
+Setup1/
 
 imgui.ini
 *.omvcfg
