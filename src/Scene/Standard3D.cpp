@@ -43,6 +43,7 @@ Standard3D::Standard3D(Globe& gb, const std::string& name) : MidiScene(gb, name)
 }
 
 void Standard3D::Init(Globe& gb) {
+	MidiScene::Init(gb);
 	if (auto opCam = gb.Cams().GetCamera("Camera0"); opCam) {
 		opCam.value().get().SetHomePos({ 0, 0, -960.0f });
 		opCam.value().get().SetHomeRotation({ 0, 0, 0 });

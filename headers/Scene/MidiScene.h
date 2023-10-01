@@ -8,8 +8,8 @@
 
 class MidiScene : public Scene {
 private:
-	MIDI::RawMidi rawMidi;
-	bool midiPathChanged = false;
+	static MIDI::RawMidi rawMidi;
+	static bool midiPathChanged;
 protected:
 	bool isPlaying = false;
 
@@ -26,28 +26,28 @@ protected:
 	u32 currentTempo = 500000;
 
 	f32 lengthScale = 2.0f/3.0f;
-	std::wstring midiPath;
-	MIDI::CookedMidi midi;
-	i32 midiOffset = 0;
-	i32 midiOffsetPrev = 0;
+	static std::wstring midiPath;
+	static MIDI::CookedMidi midi;
+	static i32 midiOffset;
+	static i32 midiOffsetPrev;
 
-	std::wstring audioPath;
-	Sound sound;
-	f32 volume = 1.0f;
-	f32 volumePrev = 1.0f;
-	i32 audioOffset = 0;
-	i32 audioOffsetPrev = 0;
+	static std::wstring audioPath;
+	static Sound sound;
+	static f32 volume;
+	static f32 volumePrev;
+	static i32 audioOffset;
+	static i32 audioOffsetPrev;
 
-	std::wstring imagePath;
-	std::unique_ptr<QuadTextured> pBGImg;
-	std::unique_ptr<PixelConstantBufferCaching> pBGImgTintBuf;
-	DirectX::XMFLOAT4 bgImgTint = { 1.0f, 1.0f, 1.0f, 1.0f };
+	static std::wstring imagePath;
+	static std::unique_ptr<QuadTextured> pBGImg;
+	static std::unique_ptr<PixelConstantBufferCaching> pBGImgTintBuf;
+	static DirectX::XMFLOAT4 bgImgTint;
 	bool clearBGImg = false;
 
-	f32 playX = 0.0f;
-	std::vector<std::pair<usize, bool>> trackReorder; // <index, enabled>
+	static f32 playX;
+	static std::vector<std::pair<usize, bool>> trackReorder; // <index, enabled>
 
-	std::unordered_map<std::string, bool> sceneSel;
+	static std::unordered_map<std::string, bool> sceneSel;
 	f32 camFOV = 60.0f;
 
 public:

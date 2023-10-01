@@ -13,6 +13,26 @@
 #include "Windows\Window.h"
 #include <fstream>
 
+MIDI::RawMidi MidiScene::rawMidi;
+bool MidiScene::midiPathChanged = false;
+std::wstring MidiScene::midiPath;
+MIDI::CookedMidi MidiScene::midi;
+i32 MidiScene::midiOffset = 0;
+i32 MidiScene::midiOffsetPrev = 0;
+std::wstring MidiScene::audioPath;
+Sound MidiScene::sound;
+f32 MidiScene::volume = 1.0f;
+f32 MidiScene::volumePrev = 1.0f;
+i32 MidiScene::audioOffset = 0;
+i32 MidiScene::audioOffsetPrev = 0;
+std::wstring MidiScene::imagePath;
+std::unique_ptr<QuadTextured> MidiScene::pBGImg;
+std::unique_ptr<PixelConstantBufferCaching> MidiScene::pBGImgTintBuf;
+DirectX::XMFLOAT4 MidiScene::bgImgTint = { 1.0f, 1.0f, 1.0f, 1.0f };
+f32 MidiScene::playX = 0.0f;
+std::vector<std::pair<usize, bool>> MidiScene::trackReorder; // <index, enabled>
+std::unordered_map<std::string, bool> MidiScene::sceneSel;
+
 MidiScene::MidiScene(Globe& gb, const std::string& name) : Scene(gb, name) {
 	CBD::RawLayout layout;
 	layout.Add(CBD::Float4, "imgTint");
@@ -22,7 +42,7 @@ MidiScene::MidiScene(Globe& gb, const std::string& name) : Scene(gb, name) {
 void MidiScene::Init(Globe& gb) {
 	pBGImgTintBuf->GetBuffer()["imgTint"] = bgImgTint;
 	pBGImgTintBuf->Bind(gb.Gfx());
-	InitMidi(gb);
+	needsReset = true;
 }
 
 void MidiScene::Update(Globe& gb) {

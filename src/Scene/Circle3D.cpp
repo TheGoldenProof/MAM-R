@@ -41,6 +41,7 @@ Circle3D::Circle3D(Globe& gb, const std::string& name) : MidiScene(gb, name) {
 }
 
 void Circle3D::Init(Globe& gb) {
+	MidiScene::Init(gb);
 	if (auto opCam = gb.Cams().GetCamera("Camera0"); opCam) {
 		opCam.value().get().SetHomePos({ -480.0f, 0, 0 });
 		opCam.value().get().SetHomeRotation({ 0, Math::to_rad(90.0f), 0 });
