@@ -189,7 +189,7 @@ void Circle3D::DrawGUI(Globe& gb) {
 		if (ImGui::TreeNode("Note Options")) {
 			ImGui::PushItemWidth(128.0f);
 			VALTM(ImGui::SliderFloat("Velocity Intensity", &velocityFactor, 0.0f, 1.0f));
-			if (ImGui::SliderInt("Note Sides", &noteType, 3, 4)) reloadMidi = autoReload;
+			if (ImGui::SliderInt("Note Sides", &noteType, 3, 4)) reloadVisuals = autoReload;
 			VALTM(ImGui::SliderAngle("Note Rotation", &noteRotation, -180.0f, 180.0f));
 			VALTM(ImGui::InputFloat("Height", &noteHeight));
 			VALTM(ImGui::InputFloat("Length Factor", &lengthScale));
@@ -206,23 +206,23 @@ void Circle3D::DrawGUI(Globe& gb) {
 				if (ImGui::Button(std::format("-##del{:d}", i).c_str(), buttonSize)) {
 					trackColors.erase(trackColors.begin() + i);
 					i--;
-					reloadMidi = autoReload;
+					reloadVisuals = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("+##trRadd{:d}", i).c_str(), buttonSize)) {
 					trackColors.insert(trackColors.begin() + i, trackColors[i]);
 					i++;
-					reloadMidi = autoReload;
+					reloadVisuals = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("^##trRup{:d}", i).c_str(), buttonSize) && i != 0) {
 					trackColors[i].swap(trackColors[i - 1]);
-					reloadMidi = autoReload;
+					reloadVisuals = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("v##trRdown{:d}", i).c_str(), buttonSize) && i != trackColors.size() - 1) {
 					trackColors[i].swap(trackColors[i + 1]);
-					reloadMidi = autoReload;
+					reloadVisuals = autoReload;
 				}
 				ImGui::SameLine();
 				usize trackIndex = i < midi.GetTracks().size() ? trackReorder[i].first : i;
@@ -233,7 +233,7 @@ void Circle3D::DrawGUI(Globe& gb) {
 
 			if (ImGui::Button("+##addEnd", buttonSize)) {
 				trackColors.push_back(trackColors.front());
-				reloadMidi = autoReload;
+				reloadVisuals = autoReload;
 			}
 
 			ImGui::TreePop();

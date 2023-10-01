@@ -40,6 +40,7 @@ MidiScene::MidiScene(Globe& gb, const std::string& name) : Scene(gb, name) {
 }
 
 void MidiScene::Init(Globe& gb) {
+	ReadConfig(gb);
 	pBGImgTintBuf->GetBuffer()["imgTint"] = bgImgTint;
 	pBGImgTintBuf->Bind(gb.Gfx());
 	needsReset = true;
@@ -49,6 +50,7 @@ void MidiScene::Update(Globe& gb) {
 	if (needsReset) {
 		Reset(gb);
 		reloadMidi = false;
+		reloadVisuals = false;
 		reloadAudio = false;
 		needsRestart = false;
 		needsReset = false;
@@ -60,6 +62,7 @@ void MidiScene::Update(Globe& gb) {
 	if (reloadMidi) {
 		InitMidi(gb);
 		reloadMidi = false;
+		reloadVisuals = false;
 		lastValueChange = std::chrono::steady_clock::time_point::max();
 	}
 	if (reloadVisuals || (autoReload && 
@@ -248,19 +251,19 @@ void MidiScene::DrawGUI(Globe& gb) {
 			for (u32 i = 0; i < midi.GetTracks().size(); i++) {
 				if (ImGui::Button(std::format("^##trRup{:d}", i).c_str(), buttonSize) && i != 0) {
 					std::swap(trackReorder[i], trackReorder[i-1]);
-					reloadMidi = autoReload;
+					reloadVisuals = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("v##trRdown{:d}", i).c_str(), buttonSize) && i != trackReorder.size() - 1) {
 					std::swap(trackReorder[i], trackReorder[i+1]);
-					reloadMidi = autoReload;
+					reloadVisuals = autoReload;
 				}
 				ImGui::SameLine();
 				usize trackIndex = trackReorder[i].first;
 				const std::string& trackName = midi.GetTracks()[trackIndex].name;
 				std::string trackDisplyName = trackName.empty() ? std::format("Track {:d}", trackIndex + 1) : trackName;
 				if (ImGui::Checkbox(std::format("{:s}##track{:d}", std::move(trackDisplyName), trackIndex).c_str(), &trackReorder[i].second)) {
-					reloadMidi = autoReload;
+					reloadVisuals = autoReload;
 				}
 
 			}
@@ -457,5 +460,5 @@ void MidiScene::ReadConfig(Globe& gb) {
 	Config& cfg = gb.Cfg();
 	cfg.Get("bgColor", gb.clearColor, _countof(gb.clearColor));
 
-	reloadMidi = autoReload;
+	reloadVisuals = autoReload;
 }
