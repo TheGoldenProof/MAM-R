@@ -2,10 +2,12 @@
 #include "Globe.h"
 #include "Graphics\Camera.h"
 #include "Graphics\Drawable\Drawables.h"
+#include "Graphics\Render\FrameController.h"
 #include "imgui\imgui.h"
 #include "MIDI\Enums.h"
 #include "MIDI\RawMidi.h"
 #include "Scene\MidiScene.h"
+#include "Scene\SceneController.h"
 #include "TGLib\TGLib_Util.h"
 #include "Util\MyMath.h"
 #include "Windows\Window.h"
@@ -20,6 +22,7 @@ MidiScene::MidiScene(Globe& gb, const std::string& name) : Scene(gb, name) {
 void MidiScene::Init(Globe& gb) {
 	pBGImgTintBuf->GetBuffer()["imgTint"] = bgImgTint;
 	pBGImgTintBuf->Bind(gb.Gfx());
+	InitMidi(gb);
 }
 
 void MidiScene::Update(Globe& gb) {
@@ -112,6 +115,9 @@ void MidiScene::Update(Globe& gb) {
 }
 
 void MidiScene::Draw(Globe& gb) {
+	for (auto& p : sceneSel)
+		if (p.second) { gb.SceneCtrl().SetNextActive(p.first); p.second = false; return; }
+
 	Scene::Draw(gb);
 	if (pBGImg) pBGImg->Draw(gb.FrameCtrl());
 
@@ -153,6 +159,7 @@ void MidiScene::Restart(Globe& gb) {
 	if (auto opCam = gb.Cams().GetActiveCamera(); opCam) opCam.value().get().Reset();
 	playX = 0.0f;
 	currentTime = std::chrono::microseconds(1000 * midiOffset);
+	currentTick = 0;
 	MovePlay(gb, MicrosToPixels(0, 1000 * midiOffset));
 	sound.SetOffset(audioOffset);
 }
@@ -162,6 +169,10 @@ void MidiScene::Reset(Globe& gb) {
 	sound.Open(gb.Audio(), audioPath.c_str());
 	sound.SetVolume(volume);
 	Restart(gb);
+}
+
+void MidiScene::Denit(Globe& gb) {
+	ClearVisuals(gb);
 }
 
 void MidiScene::DrawGUI(Globe& gb) {
@@ -182,11 +193,17 @@ void MidiScene::DrawGUI(Globe& gb) {
 
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
-			ImGui::MenuItem("Open MIDI", nullptr, &bOpenMIDI);
-			ImGui::MenuItem("Open Audio", nullptr, &bOpenAudio);
-			ImGui::MenuItem("Open Config", nullptr, &bOpenConfig);
-			ImGui::MenuItem("Save Config", nullptr, &bSaveConfig);
-			ImGui::MenuItem("Save Config As", nullptr, &bSaveConfigAs);
+			bOpenMIDI = ImGui::MenuItem("Open MIDI", nullptr, nullptr);
+			bOpenAudio = ImGui::MenuItem("Open Audio", nullptr, nullptr);
+			bOpenConfig = ImGui::MenuItem("Open Config", nullptr, nullptr);
+			bSaveConfig = ImGui::MenuItem("Save Config", nullptr, nullptr);
+			bSaveConfigAs = ImGui::MenuItem("Save Config As", nullptr, nullptr);
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("View")) {
+			for (const auto& scName : gb.SceneCtrl().GetSceneNames()) {
+				sceneSel[scName] = ImGui::MenuItem(scName.c_str(), nullptr, nullptr, scName != name);
+			}
 			ImGui::EndMenu();
 		}
 
@@ -234,6 +251,10 @@ void MidiScene::DrawGUI(Globe& gb) {
 
 	if (ImGui::Begin("Misc Controls")) {
 		ImGui::Checkbox("Auto-apply certain changes", &autoReload);
+		if (ImGui::InputFloat("FOV", &camFOV, 1.0f, 10.0f, "%.0f")) {
+			camFOV = std::clamp(camFOV, 1.0f, 179.0f);
+			gb.FrameCtrl().fov = Math::to_rad(camFOV);
+		}
 		ImGui::ColorEdit3("Background Color", gb.clearColor, ImGuiColorEditFlags_NoInputs);
 		ImGui::Text("Background Image"); ImGui::SameLine();
 		bOpenImage = ImGui::Button("Open##bgImg"); ImGui::SameLine();

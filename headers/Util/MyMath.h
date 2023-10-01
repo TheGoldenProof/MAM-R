@@ -10,10 +10,10 @@ namespace {
 
 namespace Math {
 
-constexpr f64 PI = 3.14159265358979323;
-constexpr f64 TWO_PI = PI*2;
-constexpr f64 HALF_PI = PI/2;
-constexpr f64 QTR_PI = PI/4;
+template <typename T> constexpr T PI = T(3.1415926535897932384626433832795L);
+template <typename T> constexpr T TWO_PI = T(6.283185307179586476925286766559L);
+template <typename T> constexpr T HALF_PI = T(1.5707963267948966192313216916398L);
+template <typename T> constexpr T QTR_PI = T(0.78539816339744830961566084581988L);
 
 template<typename T>
 constexpr T sq(const T& x) {
@@ -21,9 +21,16 @@ constexpr T sq(const T& x) {
 }
 
 template<typename T>
+constexpr T map(const T& value, const T& fromLow, const T& fromHigh, const T& toLow, const T& toHigh) {
+	const T inScale = (fromHigh - fromLow); assert(inScale != 0);
+	const T outScale = (toHigh - toLow);
+	return (value - fromLow) * outScale / inScale + toLow;
+}
+
+template<typename T>
 T wrapAngle_rad(const T& theta) {
-	constexpr T pi = static_cast<T>(PI);
-	constexpr T twoPi = static_cast<T>(TWO_PI);
+	constexpr T pi = PI<T>;
+	constexpr T twoPi = TWO_PI<T>;
 	const T mod = fmod(theta, twoPi);
 
 	if (mod > pi) {
@@ -49,8 +56,8 @@ constexpr T wrapAngle_deg_int(T theta) {
 	return mod;
 }
 
-template<typename T> constexpr T to_rad(T deg) { return deg * (static_cast<T>(PI/180)); }
-template<typename T> constexpr T to_deg(T rad) { return rad * (static_cast<T>(180/PI)); }
+template<typename T> constexpr T to_rad(T deg) { return deg * (PI<T>/180); }
+template<typename T> constexpr T to_deg(T rad) { return rad * (180/PI<T>); }
 
 template<typename T> T sin_deg(T deg) { return sin(to_rad(deg)); }
 template<typename T> T cos_deg(T deg) { return cos(to_rad(deg)); }

@@ -62,7 +62,8 @@ App::App(HINSTANCE hInstance) : hInstance(hInstance), wnd(OMIDIV_WINW, OMIDIV_WI
     gb.Cams().SetActive("Camera0");
 
     sceneCtrl.AddScene(std::make_unique<Standard3D>(gb));
-    sceneCtrl.SetActive(gb, "Standard3D");
+    sceneCtrl.AddScene(std::make_unique<Circle3D>(gb));
+    sceneCtrl.SetNextActive("Standard 3D");
 
     //auto proj = DXUtil::CustomOrthoProj(OMIDIV_WINW, OMIDIV_WINH);
 }

@@ -19,8 +19,8 @@ struct Note {
 struct Track {
 	std::vector<Note> notes;
 	std::string name;
-	u8 highestNote;
-	u8 lowestNote;
+	u8 highestNote = 0;
+	u8 lowestNote = 127;
 };
 
 class CookedMidi {

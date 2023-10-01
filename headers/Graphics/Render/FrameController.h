@@ -6,6 +6,8 @@
 
 class FrameController {
 public:
+	f32 fov;
+public:
 	FrameController(Graphics& gfx);
 
 	void Accept(const class QueueJob& job, usize target) noexcept;

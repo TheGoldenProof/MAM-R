@@ -46,12 +46,17 @@ protected:
 
 	f32 playX = 0.0f;
 	std::vector<std::pair<usize, bool>> trackReorder; // <index, enabled>
+
+	std::unordered_map<std::string, bool> sceneSel;
+	f32 camFOV = 60.0f;
+
 public:
 	MidiScene(class Globe& gb, const std::string& name);
 
 	virtual void Init(Globe& gb) override;
 	virtual void Update(Globe& gb) override;
 	virtual void Draw(Globe& gb) override;
+	virtual void Denit(Globe& gb) override;
 
 	virtual void Restart(Globe& gb);
 	virtual void Reset(Globe& gb);

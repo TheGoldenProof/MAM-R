@@ -10,6 +10,7 @@
 
 FrameController::FrameController(Graphics& gfx) {
 	UNREFERENCED_PARAMETER(gfx);
+	fov = Math::to_rad(fov);
 	/*namespace dx = DirectX;
 
 	Vtx::VertexLayout l;
@@ -43,7 +44,7 @@ void FrameController::Execute(Globe& gb) dbgexcept {
 
 	constexpr f32 nearZ = 1.0f / 64;
 	const f32 aspect = static_cast<f32>(gb.Gfx().GetWidth()) / static_cast<f32>(gb.Gfx().GetHeight());
-	auto proj = DirectX::XMMatrixPerspectiveFovLH(Math::to_rad(60.0f), aspect, nearZ, 8192.0f);
+	auto proj = DirectX::XMMatrixPerspectiveFovLH(fov, aspect, nearZ, 8192.0f);
 	gb.Gfx().SetProjection(std::move(proj));
 	
 	gfx.BindSwapBuffer();

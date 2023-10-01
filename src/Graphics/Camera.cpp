@@ -36,7 +36,7 @@ void Camera::Reset() noexcept {
 
 void Camera::Rotate(f32 dx, f32 dy) noexcept {
 	rot.y = Math::wrapAngle_rad(rot.y + dx);
-	rot.x = std::clamp(rot.x + dy, 0.995f * -(f32)Math::HALF_PI, 0.995f * (f32)Math::HALF_PI);
+	rot.x = std::clamp(rot.x + dy, 0.995f * -Math::HALF_PI<f32>, 0.995f * Math::HALF_PI<f32>);
 }
 
 void Camera::Translate(DirectX::XMFLOAT3 translation) noexcept {
