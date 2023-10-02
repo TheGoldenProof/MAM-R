@@ -71,7 +71,7 @@ public:
 	DirectX::XMMATRIX GetProjection() const noexcept;
 	void SetCamera(DirectX::FXMMATRIX cam) noexcept;
 	DirectX::XMMATRIX GetCamera() const noexcept;
-	void SetDepthTest(bool enable, D3D11_COMPARISON_FUNC funcfunc = D3D11_COMPARISON_LESS, D3D11_DEPTH_WRITE_MASK mask = D3D11_DEPTH_WRITE_MASK_ALL);
+	void SetDepthTest(bool enable, D3D11_COMPARISON_FUNC funcfunc = D3D11_COMPARISON_LESS_EQUAL, D3D11_DEPTH_WRITE_MASK mask = D3D11_DEPTH_WRITE_MASK_ALL);
 	bool GetDepthTestEnabled() const noexcept;
 	D3D11_COMPARISON_FUNC GetDepthTestFunc() const noexcept;
 	D3D11_DEPTH_WRITE_MASK GetDepthTestMask() const noexcept;

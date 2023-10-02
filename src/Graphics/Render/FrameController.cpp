@@ -7,6 +7,7 @@
 #include "Graphics/Resource/RenderTarget.h"
 #include "Util/DXUtil.h"
 #include "Util\MyMath.h"
+#include <algorithm>
 
 FrameController::FrameController(Graphics& gfx) {
 	UNREFERENCED_PARAMETER(gfx);
@@ -36,14 +37,14 @@ void FrameController::Accept(const QueueJob& job, usize target) noexcept {
 
 void FrameController::Execute(Globe& gb) dbgexcept {
 	Graphics& gfx = gb.Gfx();
-
 	//ds.Clear(gfx);
+	fov = std::clamp(fov, 0.0078125f, Math::PI<f32>-0.0078125f);
 
 	const auto currentCamName = gb.Cams().GetActiveCamera().transform([](const auto& camRef) { return camRef.get().GetName(); });
 	const bool depthTestEnabled = gfx.GetDepthTestEnabled();
 
 	constexpr f32 nearZ = 1.0f / 64;
-	const f32 aspect = static_cast<f32>(gb.Gfx().GetWidth()) / static_cast<f32>(gb.Gfx().GetHeight());
+	const f32 aspect = static_cast<f32>(gfx.GetWidth()) / static_cast<f32>(gfx.GetHeight());
 	auto proj = DirectX::XMMatrixPerspectiveFovLH(fov, aspect, nearZ, 8192.0f);
 	gb.Gfx().SetProjection(std::move(proj));
 	
@@ -51,17 +52,26 @@ void FrameController::Execute(Globe& gb) dbgexcept {
 	//gfx.SetProjection(projF);
 	for (u32 i = 0; i < 16; i++) passes[i].Execute(gfx);
 
-	gb.Cams().SetActive("HUD cam");
-	gb.Cams().BindActive(gb.Gfx());
-	gfx.SetProjection(DXUtil::CustomOrthoProj(static_cast<f32>(gfx.GetWidth()), static_cast<f32>(gfx.GetHeight())));
+	gb.Cams().SetActive("Camera1");
+	gb.Cams().BindActive(gfx);
+	f32 projW = OMIDIV_WINW;
+	const f32 projH = OMIDIV_WINH;
+	if (aspect != static_cast<f32>(OMIDIV_WINW) / OMIDIV_WINH) {
+		projW = projH * aspect;
+	}
+	const f32 scale = tan(fov / 2.0f);
+	gfx.SetProjection(DXUtil::CustomOrthoProj(projW * scale, projH * scale));
 	//gfx.SetProjection(DXUtil::CustomOrthoProj(OMIDIV_WINW, OMIDIV_WINH));
+	for (u32 i = 16; i < 24; i++) passes[i].Execute(gfx);
 
+	gb.Cams().SetActive("HUD cam");
+	gb.Cams().BindActive(gfx);
 	gfx.SetDepthTest(true, D3D11_COMPARISON_EQUAL, D3D11_DEPTH_WRITE_MASK_ZERO);
-	passes[16].Execute(gfx);
+	passes[24].Execute(gfx);
 
 	//gfx.SetProjection(DXUtil::CustomOrthoProj(static_cast<f32>(gfx.GetWidth()), static_cast<f32>(gfx.GetHeight())));
 	gfx.SetDepthTest(false);
-	for (u32 i = 17; i < 32; i++) passes[i].Execute(gfx);
+	for (u32 i = 25; i < 32; i++) passes[i].Execute(gfx);
 
 	if (currentCamName) gb.Cams().SetActive(currentCamName.value());
 	if (depthTestEnabled) gfx.SetDepthTest(true);

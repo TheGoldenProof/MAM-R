@@ -58,11 +58,13 @@ App::App(HINSTANCE hInstance) : hInstance(hInstance), wnd(OMIDIV_WINW, OMIDIV_WI
     wnd.SetTitle(wndTitle);
 
     gb.Cams().AddCamera(std::make_unique<Camera>("Camera0"));
+    gb.Cams().AddCamera(std::make_unique<Camera>("Camera1"));
     gb.Cams().AddCamera(std::make_unique<Camera>("HUD cam"));
     gb.Cams().SetActive("Camera0");
 
     sceneCtrl.AddScene(std::make_unique<Standard3D>(gb));
     sceneCtrl.AddScene(std::make_unique<Circle3D>(gb));
+    sceneCtrl.AddScene(std::make_unique<Circle2D>(gb));
     sceneCtrl.SetNextActive("Standard 3D");
 
     //auto proj = DXUtil::CustomOrthoProj(OMIDIV_WINW, OMIDIV_WINH);
@@ -150,7 +152,6 @@ void App::Draw(f32 dt) {
 
     //if (show_demo_window && gb.Gfx().IsImguiEnabled()) 
     //ImGui::ShowDemoWindow();
-    if (gb.Gfx().IsImguiEnabled()) gb.Cams().SpawnWindowFor("Camera0");
 
     if (gb.Gfx().IsImDebugEnabled()) {
         f32 avgTps = std::accumulate(tpsArr.begin(), tpsArr.end(), 0.0f) / tpsArr.size();

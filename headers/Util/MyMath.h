@@ -22,7 +22,8 @@ constexpr T sq(const T& x) {
 
 template<typename T>
 constexpr T map(const T& value, const T& fromLow, const T& fromHigh, const T& toLow, const T& toHigh) {
-	const T inScale = (fromHigh - fromLow); assert(inScale != 0);
+	const T inScale = (fromHigh - fromLow); 
+	if (inScale == 0) return (toLow + toHigh) / 2;
 	const T outScale = (toHigh - toLow);
 	return (value - fromLow) * outScale / inScale + toLow;
 }

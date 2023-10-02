@@ -17,7 +17,6 @@ private:
 	f32 noteRotation = 0.0f;
 	f32 noteHeight = 10.0f;
 	f32 noteHSpacing = 2.0f;
-	std::vector<std::array<f32, 4>> trackColors;
 public:
 	Circle3D(class Globe& gb, const std::string& name = "Circle 3D");
 

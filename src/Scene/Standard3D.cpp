@@ -13,33 +13,6 @@ Standard3D::Standard3D(Globe& gb, const std::string& name) : MidiScene(gb, name)
 	CBD::RawLayout layout;
 	layout.Add(CBD::Float, "planeX");
 	pPlayPlanePBuf = std::make_unique<PixelConstantBufferCaching>(gb.Gfx(), CBD::Buffer(std::move(layout)), 0);
-
-	trackColors = {
-		{1.00f, 0.00f, 0.00f, 1.0f},
-		{1.00f, 0.25f, 0.00f, 1.0f},
-		{1.00f, 0.50f, 0.00f, 1.0f},
-		{1.00f, 0.75f, 0.00f, 1.0f},
-		{1.00f, 1.00f, 0.00f, 1.0f},
-		{0.75f, 1.00f, 0.00f, 1.0f},
-		{0.50f, 1.00f, 0.00f, 1.0f},
-		{0.25f, 1.00f, 0.00f, 1.0f},
-		{0.00f, 1.00f, 0.00f, 1.0f},
-		{0.00f, 1.00f, 0.25f, 1.0f},
-		{0.00f, 1.00f, 0.50f, 1.0f},
-		{0.00f, 1.00f, 0.75f, 1.0f},
-		{0.00f, 1.00f, 1.00f, 1.0f},
-		{0.00f, 0.75f, 1.00f, 1.0f},
-		{0.00f, 0.50f, 1.00f, 1.0f},
-		{0.00f, 0.25f, 1.00f, 1.0f},
-		{0.00f, 0.00f, 1.00f, 1.0f},
-		{0.25f, 0.00f, 1.00f, 1.0f},
-		{0.50f, 0.00f, 1.00f, 1.0f},
-		{0.75f, 0.00f, 1.00f, 1.0f},
-		{1.00f, 0.00f, 1.00f, 1.0f},
-		{1.00f, 0.00f, 0.75f, 1.0f},
-		{1.00f, 0.00f, 0.50f, 1.0f},
-		{1.00f, 0.00f, 0.25f, 1.0f},
-	};
 }
 
 void Standard3D::Init(Globe& gb) {
@@ -182,6 +155,9 @@ void Standard3D::DrawGUI(Globe& gb) {
 #define VALTM(statement) if (statement) lastValueChange = std::chrono::steady_clock::now()
 
 	MidiScene::DrawGUI(gb);
+
+	gb.Cams().SpawnWindowFor("Camera0");
+
 	if (ImGui::Begin("Keybinds")) {
 		ImGui::Text("W/A/S/D/E/Q: Camera Position");
 		ImGui::Text("Arrow Keys: Camera Rotation");

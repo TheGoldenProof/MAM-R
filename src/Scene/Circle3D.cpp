@@ -11,33 +11,6 @@ Circle3D::Circle3D(Globe& gb, const std::string& name) : MidiScene(gb, name) {
 	CBD::RawLayout layout;
 	layout.Add(CBD::Float, "planeX");
 	pPlayPlanePBuf = std::make_unique<PixelConstantBufferCaching>(gb.Gfx(), CBD::Buffer(std::move(layout)), 0);
-
-	trackColors = {
-		{1.00f, 0.00f, 0.00f, 1.0f},
-		{1.00f, 0.25f, 0.00f, 1.0f},
-		{1.00f, 0.50f, 0.00f, 1.0f},
-		{1.00f, 0.75f, 0.00f, 1.0f},
-		{1.00f, 1.00f, 0.00f, 1.0f},
-		{0.75f, 1.00f, 0.00f, 1.0f},
-		{0.50f, 1.00f, 0.00f, 1.0f},
-		{0.25f, 1.00f, 0.00f, 1.0f},
-		{0.00f, 1.00f, 0.00f, 1.0f},
-		{0.00f, 1.00f, 0.25f, 1.0f},
-		{0.00f, 1.00f, 0.50f, 1.0f},
-		{0.00f, 1.00f, 0.75f, 1.0f},
-		{0.00f, 1.00f, 1.00f, 1.0f},
-		{0.00f, 0.75f, 1.00f, 1.0f},
-		{0.00f, 0.50f, 1.00f, 1.0f},
-		{0.00f, 0.25f, 1.00f, 1.0f},
-		{0.00f, 0.00f, 1.00f, 1.0f},
-		{0.25f, 0.00f, 1.00f, 1.0f},
-		{0.50f, 0.00f, 1.00f, 1.0f},
-		{0.75f, 0.00f, 1.00f, 1.0f},
-		{1.00f, 0.00f, 1.00f, 1.0f},
-		{1.00f, 0.00f, 0.75f, 1.0f},
-		{1.00f, 0.00f, 0.50f, 1.0f},
-		{1.00f, 0.00f, 0.25f, 1.0f},
-	};
 }
 
 void Circle3D::Init(Globe& gb) {
@@ -80,13 +53,13 @@ void Circle3D::InitVisuals(Globe& gb) {
 			.pixelShader = "DarkenPlayed_PS.cso",
 		};
 		auto pQbatch = std::make_unique<QuadBatchColored>(gb.Gfx(), std::move(desc));
+		const f32 trackRadius = startRadius + i * deltaRadius;
 		for (usize j = 0; j < noteCount; j++) {
 			const MIDI::Note& note = track.notes[j];
 			const f32 noteLength = note.lengthTicks * lengthScale;
 			auto velScale = [&note, this](f32 val) {return val * (note.velocity / 128.0f * velocityFactor + (1.0f - velocityFactor)); };
 
 			const f32 noteX = note.startTick * lengthScale + noteLength * 0.5f + noteHSpacing / 2;
-			const f32 trackRadius = startRadius + i * deltaRadius;
 			const f32 noteTheta = angleOffset + Math::map<f32>(note.pitch, track.lowestNote, track.highestNote + 1.0f, -Math::PI<f32>, Math::PI<f32>);
 			const f32 noteYBase = trackRadius * sin(noteTheta);
 			const f32 noteZBase = trackRadius * cos(noteTheta);
@@ -173,11 +146,14 @@ void Circle3D::DrawGUI(Globe& gb) {
 	#define VALTM(statement) if (statement) lastValueChange = std::chrono::steady_clock::now()
 
 	MidiScene::DrawGUI(gb);
-	if (ImGui::Begin("Keybinds")) {
+
+	gb.Cams().SpawnWindowFor("Camera0");
+
+	/*if (ImGui::Begin("Keybinds")) {
 		ImGui::Text("W/A/S/D/E/Q: Camera Position");
 		ImGui::Text("Arrow Keys: Camera Rotation");
 	}
-	ImGui::End();
+	ImGui::End();*/
 
 	if (ImGui::Begin("MIDI Controls")) {
 		ImGui::PushItemWidth(128.0f);
@@ -246,6 +222,8 @@ void Circle3D::DrawGUI(Globe& gb) {
 }
 
 void Circle3D::WriteConfig(Globe& gb) {
+	MidiScene::WriteConfig(gb);
+
 	Config& cfg = gb.Cfg();
 	cfg.Set("c3d.camFOV", camFOV);
 	cfg.Set("c3d.startRadius", startRadius);

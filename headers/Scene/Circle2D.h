@@ -1,24 +1,27 @@
 #pragma once
 #include "Scene\MidiScene.h"
-#include "Graphics\Bindable\ConstantBuffers.h"
 #include <array>
-#include <vector>
+#include <bitset>
 
-class Standard3D : public MidiScene {
+class Circle2D : public MidiScene {
 private:
-	std::unique_ptr<PixelConstantBufferCaching> pPlayPlanePBuf;
 	std::vector<std::unique_ptr<class QuadBatchColored>> trackVisuals;
+	std::unique_ptr<class QuadBatchColored> pPlayingVisuals;
 
-	f32 zSpacing = 15.0f;
-	f32 zSpacingPrev = 0.0f;
-	f32 velocityFactor = 0.75f;
+	f32 startRadius = 450.0f;
+	f32 deltaRadius = -32.0f;
+	f32 angleOffset;
+	f32 angleRange;
+	bool alignEnds = false;
 	i32 noteType = 4;
 	f32 noteRotation = 0.0f;
-	f32 noteHeight = 10.0f;
-	f32 noteVSpacing = 2.0f;
-	f32 noteHSpacing = 2.0f;
+	f32 noteSize = 30.0f;
+	f32 noteAlpha = 0.125f;
+	f32 noteFadeTime = 1.0f;
+
+	std::vector<std::array<f32, 128>> noteFades;
 public:
-	Standard3D(class Globe& gb, const std::string& name = "Standard 3D");
+	Circle2D(class Globe& gb, const std::string& name = "Circle 2D");
 
 	virtual void Init(Globe& gb) override;
 	virtual void Draw(Globe& gb) override;
@@ -30,5 +33,5 @@ protected:
 	virtual void WriteConfig(Globe& gb) override;
 	virtual void ReadConfig(Globe& gb) override;
 private:
-	void UpdateInputs(Globe& gb);
+	void UpdateVisuals(Globe& gb);
 };

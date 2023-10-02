@@ -194,6 +194,7 @@ void QuadBatchColored::AddOneQuad(const QuadDesc& quad) {
 	}
 
 	indicies.resize(indicies.size() + 6);
+
 }
 
 void QuadBatchColored::AddOneTriangle(const QuadDesc& triangle) {

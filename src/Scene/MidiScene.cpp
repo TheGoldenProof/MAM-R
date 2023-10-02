@@ -32,6 +32,32 @@ DirectX::XMFLOAT4 MidiScene::bgImgTint = { 1.0f, 1.0f, 1.0f, 1.0f };
 f32 MidiScene::playX = 0.0f;
 std::vector<std::pair<usize, bool>> MidiScene::trackReorder; // <index, enabled>
 std::unordered_map<std::string, bool> MidiScene::sceneSel;
+std::vector<std::array<f32, 4>> MidiScene::trackColors = {
+		{1.00f, 0.00f, 0.00f, 1.0f},
+		{1.00f, 0.25f, 0.00f, 1.0f},
+		{1.00f, 0.50f, 0.00f, 1.0f},
+		{1.00f, 0.75f, 0.00f, 1.0f},
+		{1.00f, 1.00f, 0.00f, 1.0f},
+		{0.75f, 1.00f, 0.00f, 1.0f},
+		{0.50f, 1.00f, 0.00f, 1.0f},
+		{0.25f, 1.00f, 0.00f, 1.0f},
+		{0.00f, 1.00f, 0.00f, 1.0f},
+		{0.00f, 1.00f, 0.25f, 1.0f},
+		{0.00f, 1.00f, 0.50f, 1.0f},
+		{0.00f, 1.00f, 0.75f, 1.0f},
+		{0.00f, 1.00f, 1.00f, 1.0f},
+		{0.00f, 0.75f, 1.00f, 1.0f},
+		{0.00f, 0.50f, 1.00f, 1.0f},
+		{0.00f, 0.25f, 1.00f, 1.0f},
+		{0.00f, 0.00f, 1.00f, 1.0f},
+		{0.25f, 0.00f, 1.00f, 1.0f},
+		{0.50f, 0.00f, 1.00f, 1.0f},
+		{0.75f, 0.00f, 1.00f, 1.0f},
+		{1.00f, 0.00f, 1.00f, 1.0f},
+		{1.00f, 0.00f, 0.75f, 1.0f},
+		{1.00f, 0.00f, 0.50f, 1.0f},
+		{1.00f, 0.00f, 0.25f, 1.0f},
+};
 
 MidiScene::MidiScene(Globe& gb, const std::string& name) : Scene(gb, name) {
 	CBD::RawLayout layout;
@@ -95,7 +121,7 @@ void MidiScene::Update(Globe& gb) {
 		QuadTextured::QuadDesc desc{
 			.uniqueName = "BG image",
 			.size = {1.0f, 1.0f},
-			.layer = 16,
+			.layer = 24,
 			.vertexShader = "BGImg_VS.cso",
 			.pixelShader = "BGImg_PS.cso",
 			.texture = imagePath,
@@ -112,8 +138,10 @@ void MidiScene::Update(Globe& gb) {
 
 	if (midiOffset != midiOffsetPrev) {
 		const std::chrono::microseconds diff(1000 * (midiOffset - midiOffsetPrev));
-		MovePlay(gb, MicrosToPixels(currentTime.count(), diff.count()));
+		f32 tickCount = MicrosToTicks(currentTime.count(), diff.count());
+		MovePlay(gb, tickCount);
 		currentTime += diff;
+		currentTick += static_cast<u32>(tickCount);
 		midiOffsetPrev = midiOffset;
 	}
 
@@ -182,8 +210,9 @@ void MidiScene::Restart(Globe& gb) {
 	if (auto opCam = gb.Cams().GetActiveCamera(); opCam) opCam.value().get().Reset();
 	playX = 0.0f;
 	currentTime = std::chrono::microseconds(1000 * midiOffset);
-	currentTick = 0;
-	MovePlay(gb, MicrosToPixels(0, 1000 * midiOffset));
+	f32 tickCount = MicrosToTicks(0, 1000 * midiOffset);
+	currentTick = static_cast<u32>(tickCount);
+	MovePlay(gb, tickCount);
 	sound.SetOffset(audioOffset);
 }
 
@@ -196,6 +225,7 @@ void MidiScene::Reset(Globe& gb) {
 
 void MidiScene::Denit(Globe& gb) {
 	ClearVisuals(gb);
+	WriteConfig(gb);
 }
 
 void MidiScene::DrawGUI(Globe& gb) {
@@ -310,11 +340,14 @@ void MidiScene::DrawGUI(Globe& gb) {
 
 	if (bOpenMIDI) {
 		std::vector<std::pair<const wchar_t*, const wchar_t*>> fileTypes = { {L"MIDI file", L"*.mid;*.midi"}, {L"All files", L"*.*"} };
-		midiPath = gb.Wnd().OpenFile(std::move(fileTypes), 1, L".mid");
-		midiPathChanged = true;
-		isPlaying = false;
-		reloadMidi = true;
-		needsRestart = true;
+		std::wstring newMidiPath = gb.Wnd().OpenFile(std::move(fileTypes), 1, L".mid");
+		if (!newMidiPath.empty()) {
+			midiPath = std::move(newMidiPath);
+			midiPathChanged = true;
+			isPlaying = false;
+			reloadMidi = true;
+			needsRestart = true;
+		}
 	}
 
 	if (bOpenAudio) {
@@ -322,11 +355,14 @@ void MidiScene::DrawGUI(Globe& gb) {
 			// idk what all sound files can even be opened so im just gonna leave it as this.
 			{L"All files", L"*.*"} 
 		};
-		audioPath = gb.Wnd().OpenFile(fileTypes, 1, L".mp3");
-		sound.Open(gb.Audio(), audioPath.c_str());
-		isPlaying = false;
-		reloadAudio = true;
-		needsRestart = true;
+		std::wstring newAudioPath = gb.Wnd().OpenFile(fileTypes, 1, L".mp3");
+		if (!newAudioPath.empty()) {
+			audioPath = std::move(newAudioPath);
+			sound.Open(gb.Audio(), audioPath.c_str());
+			isPlaying = false;
+			reloadAudio = true;
+			needsRestart = true;
+		}
 	}
 
 	if (bOpenImage) {
@@ -340,7 +376,8 @@ void MidiScene::DrawGUI(Globe& gb) {
 			{L"BMP", L"*.bmp"},
 			{L"All files", L"*.*"}
 		};
-		imagePath = gb.Wnd().OpenFile(fileTypes, 1, L".png");
+		std::wstring newImagePath = gb.Wnd().OpenFile(fileTypes, 1, L".png");
+		if (!newImagePath.empty()) imagePath = std::move(newImagePath);
 	}
 
 	if (bOpenConfig) {
@@ -357,7 +394,7 @@ void MidiScene::DrawGUI(Globe& gb) {
 	}
 }
 
-f32 MidiScene::MicrosToPixels(i64 start, i64 micros) const {
+f32 MidiScene::MicrosToTicks(i64 start, i64 micros) const {
 	f32 odx = 0;
 	const auto& tempoMap = midi.GetTempoMap();
 

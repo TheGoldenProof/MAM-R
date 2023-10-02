@@ -50,6 +50,8 @@ protected:
 	static std::unordered_map<std::string, bool> sceneSel;
 	f32 camFOV = 60.0f;
 
+	static std::vector<std::array<f32, 4>> trackColors;
+
 public:
 	MidiScene(class Globe& gb, const std::string& name);
 
@@ -67,7 +69,7 @@ protected:
 	virtual void DrawGUI(class Globe& gb);
 	virtual void WriteConfig(Globe& gb);
 	virtual void ReadConfig(Globe& gb);
-	f32 MicrosToPixels(i64 start, i64 micros) const;
+	f32 MicrosToTicks(i64 start, i64 micros) const;
 private:
 	void InitMidi(class Globe& gb);
 	void UpdateTPS(class Globe& gb);
