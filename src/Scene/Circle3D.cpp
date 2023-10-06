@@ -181,13 +181,11 @@ void Circle3D::DrawGUI(Globe& gb) {
 			for (u32 i = 0; i < trackColors.size(); i++) {
 				if (ImGui::Button(std::format("-##del{:d}", i).c_str(), buttonSize)) {
 					trackColors.erase(trackColors.begin() + i);
-					i--;
 					reloadVisuals = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("+##trRadd{:d}", i).c_str(), buttonSize)) {
 					trackColors.insert(trackColors.begin() + i, trackColors[i]);
-					i++;
 					reloadVisuals = autoReload;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
