@@ -48,17 +48,19 @@ void Quad::SpawnControlWindow(Graphics& gfx, const std::string& name) noexcept {
 }
 
 void Quad::SpawnControlWindowInner() noexcept {
+	constexpr f32 oneOn120 = 1.0f / 120.0f;
+	constexpr f32 oneOn12 = 1.0f / 12.0f;
 	ImGui::Text("Position");
-	ImGui::InputFloat("X", &pos.x, 20.0f, 200.0f);
-	ImGui::InputFloat("Y", &pos.y, 20.0f, 200.0f);
-	ImGui::InputFloat("Z", &pos.z, 20.0f, 200.0f);
+	ImGui::InputFloat("X", &pos.x, oneOn120, oneOn12);
+	ImGui::InputFloat("Y", &pos.y, oneOn120, oneOn12);
+	ImGui::InputFloat("Z", &pos.z, oneOn120, oneOn12);
 	ImGui::Text("Orientation");
 	ImGui::SliderAngle("Roll", &roll, -180.0f, 180.0f);
 	ImGui::SliderAngle("Pitch", &pitch, -180.0f, 180.0f);
 	ImGui::SliderAngle("Yaw", &yaw, -180.0f, 180.0f);
-	ImGui::Text("Size");
-	ImGui::InputFloat("Width", &scaleW, 20.0f, 200.0f);
-	ImGui::InputFloat("Height", &scaleH, 20.0f, 200.0f);
+	ImGui::Text("Scale");
+	ImGui::InputFloat("Width", &scaleW, oneOn120, oneOn12);
+	ImGui::InputFloat("Height", &scaleH, oneOn120, oneOn12);
 
 	class Probe : public TechniqueProbe {
 	public:

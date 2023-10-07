@@ -128,7 +128,7 @@ void MidiScene::Update(Globe& gb) {
 			.sizeMode = SIZE_MODE_ABSOLUTE,
 		};
 		pBGImg = std::make_unique<QuadTextured>(gb.Gfx(), std::move(desc));
-		pBGImg->SetScale({ static_cast<f32>(gb.Gfx().GetWidth()), static_cast<f32>(gb.Gfx().GetHeight()) });
+		pBGImg->SetScale({ static_cast<f32>(gb.Gfx().GetWidth()) / static_cast<f32>(gb.Gfx().GetHeight()), 1.0f });
 		imagePath.clear();
 	}
 
@@ -317,7 +317,7 @@ void MidiScene::DrawGUI(Globe& gb) {
 			pBGImg->SpawnControlWindowInner();
 			ImGui::PopItemWidth();
 			if (ImGui::Button("Stretch to window"))
-				pBGImg->SetScale({ static_cast<f32>(gb.Gfx().GetWidth()), static_cast<f32>(gb.Gfx().GetHeight()) });
+				pBGImg->SetScale({ static_cast<f32>(gb.Gfx().GetWidth()) / static_cast<f32>(gb.Gfx().GetHeight()), 1.0f });
 			if (ImGui::ColorEdit4("Image Tint", (float*)&bgImgTint, ImGuiColorEditFlags_NoInputs)) {
 				pBGImgTintBuf->GetBuffer()["imgTint"] = bgImgTint;
 				pBGImgTintBuf->Bind(gb.Gfx());

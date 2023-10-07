@@ -54,13 +54,14 @@ void FrameController::Execute(Globe& gb) dbgexcept {
 
 	gb.Cams().SetActive("Camera1");
 	gb.Cams().BindActive(gfx);
-	f32 projW = OMIDIV_WINW;
-	const f32 projH = OMIDIV_WINH;
-	if (aspect != static_cast<f32>(OMIDIV_WINW) / OMIDIV_WINH) {
-		projW = projH * aspect;
-	}
-	const f32 scale = tan(fov / 2.0f);
-	gfx.SetProjection(DXUtil::CustomOrthoProj(projW * scale, projH * scale));
+	//f32 projW = OMIDIV_WINW;
+	//const f32 projH = OMIDIV_WINH;
+	//if (aspect != static_cast<f32>(OMIDIV_WINW) / OMIDIV_WINH) {
+	//	projW = projH * aspect;
+	//}
+	//const f32 scale = 1.0f;// tan(fov / 2.0f);
+	//gfx.SetProjection(DXUtil::CustomOrthoProj(projW * scale, projH * scale));
+	gfx.SetProjection(DXUtil::CustomOrthoProj(aspect, 1.0f));
 	//gfx.SetProjection(DXUtil::CustomOrthoProj(OMIDIV_WINW, OMIDIV_WINH));
 	for (u32 i = 16; i < 24; i++) passes[i].Execute(gfx);
 
