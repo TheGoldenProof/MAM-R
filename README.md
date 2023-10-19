@@ -10,6 +10,11 @@ If the audio doesn't sync up with the notes, use the Offset (ms) in the audio or
 Demo videos:  
 [Open MIDI Visualizer (Alpha Demo)](https://youtu.be/4YJwQmvFq10)
 
+**No license?**  
+I'll add a proper open-source license once the first release version (v1.x.x, not alpha or beta) is released. Until then:  
+- You are free to modify a version of it for your own use, but don't distribute that version.  
+- If you make public any content made with it (like youtube video), including with your modified version, give credit.
+
 ## What's Next / To Do
 - ffmpeg export
 - other visualizations
