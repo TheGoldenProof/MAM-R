@@ -186,9 +186,10 @@ void Standard3D::DrawGUI(Globe& gb) {
 			const f32 buttonDim = ImGui::GetFrameHeight();
 			const ImVec2 buttonSize(buttonDim, buttonDim);
 			for (u32 i = 0; i < trackColors.size(); i++) {
-				if (ImGui::Button(std::format("-##del{:d}", i).c_str(), buttonSize)) {
+				if (ImGui::Button(std::format("-##del{:d}", i).c_str(), buttonSize) && trackColors.size() > 1) {
 					trackColors.erase(trackColors.begin() + i);
 					reloadVisuals = autoReload;
+					if (i == trackColors.size()) break;
 				}
 				ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 				if (ImGui::Button(std::format("+##trRadd{:d}", i).c_str(), buttonSize)) {
