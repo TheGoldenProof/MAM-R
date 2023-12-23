@@ -9,6 +9,7 @@
 
 Circle3D::Circle3D(Globe& gb, const std::string& name) : MidiScene(gb, name) {
 	CBD::RawLayout layout;
+	layout.Add(CBD::Float4, "playedTint");
 	layout.Add(CBD::Float, "planeX");
 	pPlayPlanePBuf = std::make_unique<PixelConstantBufferCaching>(gb.Gfx(), CBD::Buffer(std::move(layout)), 0);
 }
@@ -22,6 +23,7 @@ void Circle3D::Init(Globe& gb) {
 	}
 	camFOV = 60.0f;
 	gb.FrameCtrl().fov = Math::to_rad(camFOV);
+	pPlayPlanePBuf->GetBuffer()["playedTint"] = playedTint;
 }
 
 void Circle3D::Draw(Globe& gb) {
@@ -170,6 +172,10 @@ void Circle3D::DrawGUI(Globe& gb) {
 			VALTM(ImGui::InputFloat("Height", &noteHeight));
 			VALTM(ImGui::InputFloat("Length Factor", &lengthScale));
 			VALTM(ImGui::InputFloat("Horizontal Spacing", &noteHSpacing));
+			if (ImGui::ColorEdit4("Played Note Tint", (float*)&playedTint, ImGuiColorEditFlags_NoInputs)) {
+				lastValueChange = std::chrono::steady_clock::now();
+				pPlayPlanePBuf->GetBuffer()["playedTint"] = playedTint;
+			}
 			ImGui::PopItemWidth();
 
 			ImGui::TreePop();
@@ -233,6 +239,7 @@ void Circle3D::WriteConfig(Globe& gb) {
 	cfg.Set("c3d.noteRotation", noteRotation);
 	cfg.Set("c3d.noteHeight", noteHeight);
 	cfg.Set("c3d.noteHSpacing", noteHSpacing);
+	cfg.Set("c3d.playedTint", playedTint);
 	cfg.Set("c3d.trackColors", trackColors.data(), trackColors.size());
 
 	if (auto opCam = gb.Cams().GetCamera("Camera0"); opCam) {
@@ -255,6 +262,7 @@ void Circle3D::ReadConfig(Globe& gb) {
 	cfg.Get("c3d.noteRotation", &noteRotation);
 	cfg.Get("c3d.noteHeight", &noteHeight);
 	cfg.Get("c3d.noteHSpacing", &noteHSpacing);
+	cfg.Get("c3d.playedTint", &playedTint);
 	if (auto trackColorCount = cfg()["c3d.trackColors"].size(); trackColorCount != 0) {
 		trackColors.resize(trackColorCount / (sizeof(f32) * 4));
 		cfg.Get("c3d.trackColors", trackColors.data());

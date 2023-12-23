@@ -11,6 +11,7 @@
 
 Standard3D::Standard3D(Globe& gb, const std::string& name) : MidiScene(gb, name) {
 	CBD::RawLayout layout;
+	layout.Add(CBD::Float4, "playedTint");
 	layout.Add(CBD::Float, "planeX");
 	pPlayPlanePBuf = std::make_unique<PixelConstantBufferCaching>(gb.Gfx(), CBD::Buffer(std::move(layout)), 0);
 }
@@ -24,6 +25,7 @@ void Standard3D::Init(Globe& gb) {
 	}
 	camFOV = 60.0f;
 	gb.FrameCtrl().fov = Math::to_rad(camFOV);
+	pPlayPlanePBuf->GetBuffer()["playedTint"] = playedTint;
 }
 
 void Standard3D::Draw(Globe& gb) {
@@ -177,6 +179,10 @@ void Standard3D::DrawGUI(Globe& gb) {
 			VALTM(ImGui::InputFloat("Vertical Spacing", &noteVSpacing));
 			VALTM(ImGui::InputFloat("Length Factor", &lengthScale));
 			VALTM(ImGui::InputFloat("Horizontal Spacing", &noteHSpacing));
+			if (ImGui::ColorEdit4("Played Note Tint", (float*)&playedTint, ImGuiColorEditFlags_NoInputs)) {
+				lastValueChange = std::chrono::steady_clock::now();
+				pPlayPlanePBuf->GetBuffer()["playedTint"] = playedTint;
+			}
 			ImGui::PopItemWidth();
 
 			ImGui::TreePop();
@@ -239,6 +245,7 @@ void Standard3D::WriteConfig(Globe& gb) {
 	cfg.Set("ts.noteHeight", noteHeight);
 	cfg.Set("ts.noteVSpacing", noteVSpacing);
 	cfg.Set("ts.noteHSpacing", noteHSpacing);
+	cfg.Set("ts.playedTint", playedTint);
 	cfg.Set("ts.trackColors", trackColors.data(), trackColors.size());
 
 	if (auto opCam = gb.Cams().GetCamera("Camera0"); opCam) {
@@ -260,6 +267,7 @@ void Standard3D::ReadConfig(Globe& gb) {
 	cfg.Get("ts.noteHeight", &noteHeight);
 	cfg.Get("ts.noteVSpacing", &noteVSpacing);
 	cfg.Get("ts.noteHSpacing", &noteHSpacing);
+	cfg.Get("ts.playedTint", &playedTint);
 	if (auto trackColorCount = cfg()["ts.trackColors"].size(); trackColorCount != 0) {
 		trackColors.resize(trackColorCount / (sizeof(f32) * 4));
 		cfg.Get("ts.trackColors", trackColors.data());

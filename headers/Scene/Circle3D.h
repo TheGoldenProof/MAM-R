@@ -17,6 +17,7 @@ private:
 	f32 noteRotation = 0.0f;
 	f32 noteHeight = 10.0f;
 	f32 noteHSpacing = 2.0f;
+	DirectX::XMFLOAT4 playedTint = { 1.0f, 1.0f, 1.0f, 0.5f };
 public:
 	Circle3D(class Globe& gb, const std::string& name = "Circle 3D");
 

@@ -1,5 +1,6 @@
 cbuffer Cbuf : register(b0)
 {
+    float4 playedTint;
     float planeX;
 };
 
@@ -25,7 +26,7 @@ float4 main(VSOut input) : SV_TARGET
     
     if (dist < 0)
     {
-        color.rgb /= 2.0f;
+        color.rgba *= playedTint;
     }
     else
     {
@@ -43,7 +44,8 @@ float4 main(VSOut input) : SV_TARGET
     {
         factor = 1.0f - (absDist - minFogDist) / fogSize;
         clip(factor);
-        color.rgb = lerp(float3(0, 0, 0), color.rgb, factor*factor);
+        //color.rgb = lerp(float3(0, 0, 0), color.rgb, factor*factor);
+        color.a = factor * factor;
     }
     
     

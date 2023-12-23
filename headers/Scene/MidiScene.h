@@ -44,7 +44,7 @@ protected:
 	static DirectX::XMFLOAT4 bgImgTint;
 	bool clearBGImg = false;
 
-	static f32 playX;
+	static f32 playX; // this has to be in this class (even though its not applicable to every scene) so that scene switches retain their position.
 	static std::vector<std::pair<usize, bool>> trackReorder; // <index, enabled>
 
 	static std::unordered_map<std::string, bool> sceneSel;
