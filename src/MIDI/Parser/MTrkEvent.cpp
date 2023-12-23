@@ -1,6 +1,7 @@
 #include "MIDI\Enums.h"
 #include "MIDI\Parser\MTrkEvent.h"
 #include "MIDI\Util.h"
+#include <format>
 #include <fstream>
 
 #include <cassert>
