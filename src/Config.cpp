@@ -57,15 +57,18 @@ void Config::Read(const std::wstring& path) {
 	u8 version = 0; READ(version);
 	file.seekg(pos + static_cast<std::streamoff>(hLength));
 
-	while (true) {
-		std::string id;
-		std::getline(file, id, '\0');
-		u32 dLength = 0; READ(dLength);
-		std::vector<u8> data(dLength);
-		file.read(reinterpret_cast<char*>(data.data()), dLength);
-		cfgMap[id] = std::move(data);
-		if (!checkStream(file)) return;
+	if (version == 1) {
+		while (true) {
+			std::string id;
+			std::getline(file, id, '\0');
+			u32 dLength = 0; READ(dLength);
+			std::vector<u8> data(dLength);
+			file.read(reinterpret_cast<char*>(data.data()), dLength);
+			cfgMap[id] = std::move(data);
+			if (!checkStream(file)) return;
+		}
 	}
+	
 }
 
 #undef READ

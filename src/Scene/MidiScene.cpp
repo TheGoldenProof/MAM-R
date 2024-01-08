@@ -210,9 +210,8 @@ void MidiScene::Restart(Globe& gb) {
 	if (auto opCam = gb.Cams().GetActiveCamera(); opCam) opCam.value().get().Reset();
 	playX = 0.0f;
 	currentTime = std::chrono::microseconds(1000 * midiOffset);
-	f32 tickCount = MicrosToTicks(0, 1000 * midiOffset);
-	currentTick = static_cast<u32>(tickCount);
-	MovePlay(gb, tickCount);
+	currentTick = static_cast<u32>(MicrosToTicks(0, currentTime.count()));
+	MovePlay(gb, static_cast<f32>(currentTick));
 	sound.SetOffset(audioOffset);
 }
 
@@ -358,7 +357,6 @@ void MidiScene::DrawGUI(Globe& gb) {
 		std::wstring newAudioPath = gb.Wnd().OpenFile(fileTypes, 1, L".mp3");
 		if (!newAudioPath.empty()) {
 			audioPath = std::move(newAudioPath);
-			sound.Open(gb.Audio(), audioPath.c_str());
 			isPlaying = false;
 			reloadAudio = true;
 			needsRestart = true;
@@ -450,6 +448,9 @@ void MidiScene::InitMidi(Globe& gb) {
 
 	if (midiPathChanged) {
 		rawMidi.Open(gb, midiPath);
+		/*auto fout = std::ofstream("midi_dump.txt");
+		rawMidi.DebugPrint(fout);
+		fout.close();*/
 		trackReorder.clear();
 		midiPathChanged = false;
 	}

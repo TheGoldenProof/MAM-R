@@ -1,5 +1,7 @@
 # Open MIDI Visualizer
 
+This is the old one. The new one built in Unity is [here](https://github.com/TheGoldenProof/OMIDIV).
+
 Open MIDI Visualizer, or OMIDIV for short, or OMV for shorter, or Open Musical Information Data Interchange Visualizer for long, is an open source MIDI visualizer and audio player.
 
 Not a midi *player*. Just a visualizer.  

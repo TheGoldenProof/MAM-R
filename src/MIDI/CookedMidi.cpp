@@ -58,7 +58,8 @@ void CookedMidi::Cook(const RawMidi& raw) {
 
 		for (const auto& pEvent : trackChunk.events) {
 			currentTick += pEvent->delta;
-			currentTime += pEvent->delta * tempoMap[currentTime].second;
+			// TODO: SMPTE
+			currentTime += pEvent->delta * tempoMap[currentTime].second / header.division.ticksPerQuarter;
 
 			const u8 eventType = pEvent->GetEventType();
 			if (eventType == 0xff) {
